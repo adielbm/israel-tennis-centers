@@ -142,6 +142,11 @@ async function showCourts(date) {
     const availableCount = Array.from(results.values()).filter(r => r.status === 'available').length;
     if (availableCount > 0) {
       showToast(`נמצאו ${availableCount} מגרש${availableCount > 1 ? 'ים' : ''} פנוי${availableCount > 1 ? 'ים' : ''}`, 'success');
+
+      // Show reservation link
+      const reservationLink = document.getElementById('reservation-link');
+      reservationLink.style.display = 'inline-block';
+
     } else {
       showToast('לא נמצאו מגרשים פנויים', 'info');
     }
@@ -184,7 +189,7 @@ function renderCourtsResults(slots, results, date) {
     
     const courtsInfo = isAvailable 
       ? `${result.courts.length} מגרש${result.courts.length > 1 ? 'ים' : ''} פנוי${result.courts.length > 1 ? 'ים' : ''}`
-      : 'אין מגרשים פנויים';
+      : 'תפוס';
     
     const courtTags = isAvailable 
       ? result.courts.map(num => `<span class="court-tag">${num}</span>`).join('')
@@ -193,11 +198,8 @@ function renderCourtsResults(slots, results, date) {
     timeSlot.innerHTML = `
       <div class="time-slot-header">
         <div class="time-label">${slot.time}</div>
-        <span class="status-badge ${isAvailable ? 'available' : 'unavailable'}">
-          ${isAvailable ? 'פנוי' : 'לא פנוי'}
-        </span>
       </div>
-      <div class="courts-info">${courtsInfo}</div>
+      <div class="status-badge ${isAvailable ? 'available' : 'unavailable'}">${courtsInfo}</div>
       ${courtTags ? `<div class="court-tags">${courtTags}</div>` : ''}
     `;
     
