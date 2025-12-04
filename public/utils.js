@@ -81,6 +81,17 @@ export function formatDateDisplay(date) {
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
   const dayName = days[date.getDay()];
   const dateStr = formatDate(date);
+
+  // if today or tomorrow, add prefix
+  if (date.toDateString() === getToday().toDateString()) {
+    return `היום - ${dateStr}`;
+  }
+  const tomorrow = new Date(getToday());
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (date.toDateString() === tomorrow.toDateString()) {
+    return `מחר - ${dateStr}`;
+  }
+
   return `${dayName}, ${dateStr}`;
 }
 

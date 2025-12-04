@@ -81,13 +81,7 @@ function showDateSelection() {
   const dates = getNextDays(today, 14);
   
   dates.forEach((date, index) => {
-    const isToday = index === 0;
-    const isTomorrow = index === 1;
-    
     let label = formatDateDisplay(date);
-    if (isToday) label = `היום - ${label}`;
-    else if (isTomorrow) label = `מחר - ${label}`;
-    
     const dateItem = document.createElement('div');
     dateItem.className = 'date-item';
     dateItem.innerHTML = `
@@ -141,12 +135,10 @@ async function showCourts(date) {
     
     const availableCount = Array.from(results.values()).filter(r => r.status === 'available').length;
     if (availableCount > 0) {
-      showToast(`נמצאו ${availableCount} מגרש${availableCount > 1 ? 'ים' : ''} פנוי${availableCount > 1 ? 'ים' : ''}`, 'success');
-
       // Show reservation link
       const reservationLink = document.getElementById('reservation-link');
       reservationLink.style.display = 'inline-block';
-
+      reservationLink.style.marginTop = '30px';
     } else {
       showToast('לא נמצאו מגרשים פנויים', 'info');
     }

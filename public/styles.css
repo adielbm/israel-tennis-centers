@@ -253,7 +253,7 @@ header .subtitle {
 }
 
 .time-slot.unavailable {
-    opacity: 0.6;
+    color: #969696;
 }
 
 .time-slot-header {
