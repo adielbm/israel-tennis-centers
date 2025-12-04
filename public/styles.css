@@ -243,6 +243,8 @@ header .subtitle {
 .time-slot {
     padding-bottom: 8px;
     border-bottom: 3px solid #3498db;
+    display: grid;
+    grid-template-columns: 1fr 130px;
 }
 
 .time-slot.available {
@@ -268,10 +270,13 @@ header .subtitle {
 }
 
 .status-badge {
-    padding: 4px 12px;
     border-radius: 12px;
     font-size: 0.85rem;
+    display: flex;
+    text-align: center;
     font-weight: 500;
+    justify-content: center;
+    align-items: center;
 }
 
 .status-badge.available {
@@ -293,12 +298,13 @@ header .subtitle {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+    grid-column: span 2;
     margin-top: 8px;
 }
 
 .court-tag {
     padding: 4px 10px;
-    background: var(--text-color);
+    background: var(--text-primary);
     color: white;
     border-radius: 12px;
     font-size: 0.85rem;
