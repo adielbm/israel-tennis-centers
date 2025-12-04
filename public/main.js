@@ -1,5 +1,5 @@
 import { AuthService, APIService } from './api.js';
-import { getToday, getNextDays, formatDateDisplay, generateTimeSlotsForDate } from './utils.js';
+import { getToday, getNextDays, formatDateDisplay, generateTimeSlotsForDate, formatDate } from './utils.js';
 
 // Initialize services
 const authService = new AuthService();
@@ -122,7 +122,10 @@ async function showCourts(date) {
     
     // Search for court availability for all slots
     showToast(`Checking ${slots.length} time slots...`, 'info');
+    console.log('Searching for courts with:', { tennisCenter: credentials.tennisCenter, date, slotsCount: slots.length });
     const results = await apiService.searchMultipleSlots(credentials.tennisCenter, date, slots);
+    
+    console.log('Search completed. Results:', results);
     
     document.getElementById('loading-message').style.display = 'none';
     
@@ -146,14 +149,26 @@ async function showCourts(date) {
  * Render courts results
  */
 function renderCourtsResults(slots, results, date) {
+  console.log('=== Rendering Courts Results ===');
+  console.log('Total slots to render:', slots.length);
+  console.log('Results map size:', results.size);
+  console.log('Results keys:', Array.from(results.keys()));
+  
   const courtsList = document.getElementById('courts-list');
   courtsList.innerHTML = '';
   
   slots.forEach((slot) => {
-    const key = `${slot.date.toDateString()}_${slot.time}`;
+    // Use formatDate to match the key format used in searchMultipleSlots
+    const formattedDate = formatDate(slot.date);
+    const key = `${formattedDate}_${slot.time}`;
     const result = results.get(key);
     
-    if (!result) return;
+    console.log(`Slot ${slot.time}: key="${key}", found=${!!result}`);
+    
+    if (!result) {
+      console.warn(`No result found for slot ${slot.time} with key ${key}`);
+      return;
+    }
     
     const isAvailable = result.status === 'available';
     
