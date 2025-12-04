@@ -78,7 +78,7 @@ export function getNextDays(startDate, days) {
  * Format date for display with day name
  */
 export function formatDateDisplay(date) {
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
   const dayName = days[date.getDay()];
   const dateStr = formatDate(date);
   return `${dayName}, ${dateStr}`;
@@ -88,7 +88,7 @@ export function formatDateDisplay(date) {
  * Get weekday name in English (short)
  */
 export function getWeekday(date) {
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
   return days[date.getDay()];
 }
 

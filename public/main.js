@@ -44,24 +44,27 @@ async function handleLogin(e) {
   
   const email = document.getElementById('email').value;
   const userId = document.getElementById('user-id').value;
-  const tennisCenter = document.getElementById('tennis-center').value;
+  const tennisCenter = document.getElementById('tennis-center-city').value;
+  
+  // Validate tennis center is selected
+  if (!tennisCenter) {
+    showToast('יש לבחור מרכז טניס', 'error');
+    return;
+  }
   
   // Store credentials
   credentials = { email, userId, tennisCenter };
   localStorage.setItem('credentials', JSON.stringify(credentials));
   
-  // Update tennis center city display
-  updateTennisCenterDisplay(tennisCenter);
-  
-  showToast('Logging in...', 'info');
+  showToast('מתחבר...', 'info');
   
   try {
     await authService.login(email, userId);
-    showToast('Login successful!', 'success');
+    showToast('התחברת בהצלחה!', 'success');
     showDateSelection();
   } catch (error) {
     console.error('Login failed:', error);
-    showToast(`Login failed: ${error.message}`, 'error');
+    showToast(`התחברות נכשלה: ${error.message}`, 'error');
   }
 }
 
@@ -82,8 +85,8 @@ function showDateSelection() {
     const isTomorrow = index === 1;
     
     let label = formatDateDisplay(date);
-    if (isToday) label = `Today - ${label}`;
-    else if (isTomorrow) label = `Tomorrow - ${label}`;
+    if (isToday) label = `היום - ${label}`;
+    else if (isTomorrow) label = `מחר - ${label}`;
     
     const dateItem = document.createElement('div');
     dateItem.className = 'date-item';
@@ -117,15 +120,15 @@ async function showCourts(date) {
       document.getElementById('loading-message').style.display = 'none';
       document.getElementById('courts-list').innerHTML = `
         <div class="empty-state">
-          <h3>No time slots available</h3>
-          <p>Please try a different date.</p>
+          <h3>אין מגרשים זמינים</h3>
+          <p>יש לנסות תאריך אחר.</p>
         </div>
       `;
       return;
     }
     
     // Search for court availability for all slots
-    showToast(`Checking ${slots.length} time slots...`, 'info');
+    showToast(`בודק ${slots.length} מגרשים...`, 'info');
     console.log('Searching for courts with:', { tennisCenter: credentials.tennisCenter, date, slotsCount: slots.length });
     const results = await apiService.searchMultipleSlots(credentials.tennisCenter, date, slots);
     
@@ -138,14 +141,14 @@ async function showCourts(date) {
     
     const availableCount = Array.from(results.values()).filter(r => r.status === 'available').length;
     if (availableCount > 0) {
-      showToast(`Found ${availableCount} available time slot${availableCount > 1 ? 's' : ''}`, 'success');
+      showToast(`נמצאו ${availableCount} מגרש${availableCount > 1 ? 'ים' : ''} פנוי${availableCount > 1 ? 'ים' : ''}`, 'success');
     } else {
-      showToast('No available slots found', 'info');
+      showToast('לא נמצאו מגרשים פנויים', 'info');
     }
   } catch (error) {
     console.error('Error fetching courts:', error);
     document.getElementById('loading-message').style.display = 'none';
-    showToast('Error loading courts', 'error');
+    showToast('שגיאה בטעינת המגרשים', 'error');
   }
 }
 
@@ -211,7 +214,7 @@ function handleLogout() {
   credentials = null;
   document.getElementById('login-form').reset();
   navigateToScreen('login-screen');
-  showToast('Logged out successfully', 'success');
+  showToast('התנתקת בהצלחה', 'success');
 }
 
 /**
@@ -225,10 +228,9 @@ function handleBack() {
  * Update tennis center city display
  */
 function updateTennisCenterDisplay(tennisCenterId) {
-  const center = TENNIS_CENTERS.find(c => c.id === tennisCenterId);
   const displayElement = document.getElementById('tennis-center-city');
-  if (center && displayElement) {
-    displayElement.textContent = `${center.name}`;
+  if (displayElement) {
+    displayElement.value = tennisCenterId;
   }
 }
 
@@ -248,6 +250,21 @@ function init() {
   document.getElementById('login-form').addEventListener('submit', handleLogin);
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
   document.getElementById('back-btn').addEventListener('click', handleBack);
+  
+  // Tennis center selector change handler
+  document.getElementById('tennis-center-city').addEventListener('change', function(e) {
+    if (e.target.value && credentials) {
+      credentials.tennisCenter = e.target.value;
+      localStorage.setItem('credentials', JSON.stringify(credentials));
+      showToast('מרכז הטניס עודכן', 'success');
+      // Reload current screen if on date selection or courts
+      if (currentScreen === 'date-screen') {
+        showDateSelection();
+      } else if (currentScreen === 'courts-screen' && selectedDate) {
+        showCourts(selectedDate);
+      }
+    }
+  });
 }
 
 // Start the app

@@ -3,55 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Israel Tennis Centers - Court Availability</title>
+    <title>מרכזי הטניס והחינוך בישראל</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="favicon.svg">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>מרכזי הטניס והחינוך בישראל</h1>
-            <h2 id="tennis-center-city"></h2>
+            <div class="tennis-center-selector">
+                <select id="tennis-center-city" class="base-select">
+                    <option value="">בחר מרכז טניס...</option>
+                    <option value="12">אופקים</option>
+                    <option value="8">אשקלון</option>
+                    <option value="11">באר שבע</option>
+                    <option value="40">דימונה</option>
+                    <option value="5">חיפה</option>
+                    <option value="9">טבריה</option>
+                    <option value="3">יפו</option>
+                    <option value="14">יקנעם</option>
+                    <option value="7">ירושלים</option>
+                    <option value="46">כוכב יאיר</option>
+                    <option value="37">נהריה</option>
+                    <option value="15">סאג'ור</option>
+                    <option value="16">עכו</option>
+                    <option value="6">ערד</option>
+                    <option value="10">קרית אונו</option>
+                    <option value="4">קרית שמונה</option>
+                    <option value="2">רמת השרון</option>
+                    <option value="13">תל אביב (יד אליהו)</option>
+                </select>
+            </div>
             <p class="subtitle">בדיקת זמינות מגרשים</p>
         </header>
 
         <!-- Login Screen -->
         <div id="login-screen" class="screen active">
             <div class="card">
-                <h2>Login</h2>
                 <form id="login-form">
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email">מייל</label>
                         <input type="email" id="email" required autocomplete="email">
                     </div>
                     <div class="form-group">
-                        <label for="user-id">ID Number</label>
+                        <label for="user-id">תעודת זהות</label>
                         <input type="text" id="user-id" required pattern="[0-9]+" autocomplete="off">
                     </div>
-                    <div class="form-group">
-                        <label for="tennis-center">Tennis Center</label>
-                        <select id="tennis-center" required>
-                            <option value="">Select a center...</option>
-                            <option value="12">אופקים - Ofakim</option>
-                            <option value="8">אשקלון - Ashkelon</option>
-                            <option value="11">באר שבע - Beer Sheva</option>
-                            <option value="40">דימונה - Dimona</option>
-                            <option value="5">חיפה - Haifa</option>
-                            <option value="9">טבריה - Tiberias</option>
-                            <option value="3">יפו - Jaffa</option>
-                            <option value="14">יקנעם - Yokneam</option>
-                            <option value="7">ירושלים - Jerusalem</option>
-                            <option value="46">כוכב יאיר - Kochav Yair</option>
-                            <option value="37">נהריה - Nahariya</option>
-                            <option value="15">סאג'ור - Sajur</option>
-                            <option value="16">עכו - Acre</option>
-                            <option value="6">ערד - Arad</option>
-                            <option value="10">קרית אונו - Kiryat Ono</option>
-                            <option value="4">קרית שמונה - Kiryat Shmona</option>
-                            <option value="2">רמת השרון - Ramat Hasharon</option>
-                            <option value="13">תל אביב (יד אליהו) - Tel Aviv</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary">התחברות</button>
                 </form>
             </div>
         </div>
@@ -60,8 +58,8 @@
         <div id="date-screen" class="screen">
             <div class="card">
                 <div class="header-with-logout">
-                    <h2>Select Date</h2>
-                    <button id="logout-btn" class="btn btn-secondary btn-small">Logout</button>
+                    <h2>בחר תאריך</h2>
+                    <button id="logout-btn" class="btn btn-secondary btn-small">התנתק</button>
                 </div>
                 <div id="date-list" class="date-list"></div>
             </div>
@@ -71,12 +69,12 @@
         <div id="courts-screen" class="screen">
             <div class="card">
                 <div class="header-with-back">
-                    <button id="back-btn" class="btn btn-secondary btn-small">← Back</button>
-                    <h2 id="selected-date-title">Available Courts</h2>
+                    <button id="back-btn" class="btn btn-secondary btn-small">← חזרה</button>
+                    <h2 id="selected-date-title">מגרשים זמינים</h2>
                 </div>
                 <div id="loading-message" class="loading">
                     <div class="spinner"></div>
-                    <p>Loading court availability...</p>
+                    <p>טוען זמינות מגרשים...</p>
                 </div>
                 <div id="courts-list" class="courts-list"></div>
             </div>
