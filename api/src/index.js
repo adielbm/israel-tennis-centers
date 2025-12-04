@@ -5,6 +5,15 @@
  * center.tennis.org.il from the GitHub Pages frontend.
  */
 
+// Whitelist of allowed paths
+const ALLOWED_PATHS = [
+  '/self_services/login',
+  '/self_services/login.js',
+  '/self_services/court_invitation',
+  '/self_services/set_time_by_unit',
+  '/self_services/search_court.js'
+];
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -27,6 +36,11 @@ export default {
     
     if (!path) {
       return new Response('Bad Request: Missing path', { status: 400 });
+    }
+    
+    // Check if path is allowed
+    if (!ALLOWED_PATHS.includes(path)) {
+      return new Response('Forbidden: Path not allowed', { status: 403 });
     }
     
     // Build the target URL
