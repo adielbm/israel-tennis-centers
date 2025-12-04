@@ -3,6 +3,8 @@
  * 
  * This worker acts as a proxy to overcome CORS restrictions when accessing
  * center.tennis.org.il from the GitHub Pages frontend.
+ * It also manages session cookies server-side since cross-origin cookie sharing
+ * is blocked by browsers.
  */
 
 // Whitelist of allowed paths
@@ -48,28 +50,71 @@ export default {
     const targetUrl = `${targetBaseUrl}${path}${url.search}`;
     
     try {
+      // Get the session cookie from the client's request (if any)
+      const clientSessionCookie = request.headers.get('X-Session-Cookie');
+      
+      // Create headers for the target request
+      const targetHeaders = new Headers();
+      
+      // Copy relevant headers
+      for (const [key, value] of request.headers.entries()) {
+        if (key.toLowerCase() !== 'origin' && 
+            key.toLowerCase() !== 'host' &&
+            key.toLowerCase() !== 'x-session-cookie') {
+          targetHeaders.set(key, value);
+        }
+      }
+      
+      // If client provided a session cookie, use it
+      if (clientSessionCookie) {
+        targetHeaders.set('Cookie', clientSessionCookie);
+      }
+      
       // Forward the request to the target server
       const proxyRequest = new Request(targetUrl, {
         method: request.method,
-        headers: request.headers,
+        headers: targetHeaders,
         body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : null,
       });
-      
-      // Remove origin header to avoid CORS issues with the target server
-      proxyRequest.headers.delete('Origin');
       
       // Make the request
       const response = await fetch(proxyRequest);
       
-      // Create a new response with CORS headers
-      const newResponse = new Response(response.body, response);
+      // Extract any Set-Cookie headers from the response
+      const setCookieHeaders = response.headers.get('set-cookie');
+      
+      // Create response headers
+      const responseHeaders = new Headers();
+      
+      // Copy response headers except Set-Cookie
+      for (const [key, value] of response.headers.entries()) {
+        if (key.toLowerCase() !== 'set-cookie') {
+          responseHeaders.set(key, value);
+        }
+      }
       
       // Add CORS headers
-      newResponse.headers.set('Access-Control-Allow-Origin', allowedOrigin);
-      newResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-      newResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Cookie, Set-Cookie');
-      newResponse.headers.set('Access-Control-Expose-Headers', 'Set-Cookie');
-      newResponse.headers.set('Access-Control-Allow-Credentials', 'true');
+      responseHeaders.set('Access-Control-Allow-Origin', allowedOrigin);
+      responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type, X-Session-Cookie');
+      responseHeaders.set('Access-Control-Expose-Headers', 'X-Session-Cookie');
+      
+      // If the server set cookies, send them back in a custom header
+      // that JavaScript can read
+      if (setCookieHeaders) {
+        // Extract just the session ID cookie
+        const sessionMatch = setCookieHeaders.match(/_session_id=([^;]+)/);
+        if (sessionMatch) {
+          responseHeaders.set('X-Session-Cookie', `_session_id=${sessionMatch[1]}`);
+        }
+      }
+      
+      // Create a new response
+      const newResponse = new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: responseHeaders,
+      });
       
       return newResponse;
     } catch (error) {
@@ -88,9 +133,8 @@ function handleCORS() {
     headers: {
       'Access-Control-Allow-Origin': 'https://adielbm.github.io',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Cookie, Set-Cookie',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Session-Cookie',
       'Access-Control-Max-Age': '86400',
-      'Access-Control-Allow-Credentials': 'true',
     },
   });
 }

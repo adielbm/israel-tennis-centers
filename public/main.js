@@ -51,13 +51,13 @@ async function handleLogin(e) {
   
   showToast('Logging in...', 'info');
   
-  const success = await authService.login(email, userId);
-  
-  if (success) {
+  try {
+    await authService.login(email, userId);
     showToast('Login successful!', 'success');
     showDateSelection();
-  } else {
-    showToast('Login failed. Please check your credentials.', 'error');
+  } catch (error) {
+    console.error('Login failed:', error);
+    showToast(`Login failed: ${error.message}`, 'error');
   }
 }
 

@@ -29,12 +29,11 @@ class AuthService {
   }
 
   /**
-   * Extract session ID from Set-Cookie header
+   * Extract session cookie from custom header
    */
-  extractSessionId(setCookieHeader) {
-    if (!setCookieHeader) return null;
-    const match = setCookieHeader.match(/_session_id=([^;]+)/);
-    return match ? match[1] : null;
+  extractSessionCookie(sessionCookieHeader) {
+    if (!sessionCookieHeader) return null;
+    return sessionCookieHeader;
   }
 
   /**
@@ -42,7 +41,14 @@ class AuthService {
    */
   async getAuthenticityTokenFromLoginPage() {
     try {
-      const response = await fetch(`${WORKER_URL}/proxy/self_services/login`);
+      const headers = {};
+      if (this.sessionId && this.sessionId !== 'browser-managed') {
+        headers['X-Session-Cookie'] = this.sessionId;
+      }
+      
+      const response = await fetch(`${WORKER_URL}/proxy/self_services/login`, {
+        headers,
+      });
       const html = await response.text();
       return this.extractAuthenticityToken(html);
     } catch (error) {
@@ -78,26 +84,47 @@ class AuthService {
         body: formData.toString(),
       });
 
-      // Extract session ID from cookies
-      const setCookie = response.headers.get('set-cookie');
-      const sessionId = this.extractSessionId(setCookie);
-
-      if (!sessionId) {
-        throw new Error('Failed to get session ID from login response');
+      const responseText = await response.text();
+      
+      // Check if login was successful by looking for the redirect in the response
+      if (!responseText.includes('window.location.href') && !response.ok) {
+        throw new Error('Login failed - invalid credentials');
       }
+
+      // Extract session cookie from custom header
+      const sessionCookie = response.headers.get('X-Session-Cookie');
+      if (!sessionCookie) {
+        throw new Error('Failed to get session cookie from login response');
+      }
+
+      // Store the session cookie temporarily
+      this.sessionId = sessionCookie;
 
       // Get a fresh authenticity token for subsequent requests
       const courtInvitationResponse = await fetch(`${WORKER_URL}/proxy/self_services/court_invitation`, {
         headers: {
-          'Cookie': `_session_id=${sessionId}`,
+          'X-Session-Cookie': this.sessionId,
         },
       });
 
+      if (!courtInvitationResponse.ok) {
+        throw new Error('Failed to verify authentication');
+      }
+
       const html = await courtInvitationResponse.text();
+      
+      // If the page redirects to login, authentication failed
+      if (html.includes('window.location.href') && html.includes('/login')) {
+        throw new Error('Authentication verification failed');
+      }
+      
       const newAuthenticityToken = this.extractAuthenticityToken(html);
 
-      this.sessionId = sessionId;
-      this.authenticityToken = newAuthenticityToken || authenticityToken;
+      if (!newAuthenticityToken) {
+        throw new Error('Failed to get authenticity token after login');
+      }
+
+      this.authenticityToken = newAuthenticityToken;
 
       // Store credentials in localStorage
       this.saveToStorage();
@@ -105,7 +132,7 @@ class AuthService {
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      throw error;
     }
   }
 
@@ -179,7 +206,7 @@ class APIService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Cookie': `_session_id=${tokens.sessionId}`,
+          'X-Session-Cookie': tokens.sessionId,
         },
         body: formData.toString(),
       });
@@ -259,7 +286,7 @@ class APIService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Cookie': `_session_id=${tokens.sessionId}`,
+          'X-Session-Cookie': tokens.sessionId,
         },
         body: formData.toString(),
       });
