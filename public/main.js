@@ -42,9 +42,19 @@ function navigateToScreen(screenId) {
 async function handleLogin(e) {
   e.preventDefault();
   
-  const email = document.getElementById('email').value;
-  const userId = document.getElementById('user-id').value;
+  let email = document.getElementById('email').value;
+  let userId = document.getElementById('user-id').value;
   const tennisCenter = document.getElementById('tennis-center-city').value;
+
+  // Validate inputs
+  if (!email || !userId) {
+    showToast('יש למלא את כל השדות', 'error');
+    return;
+  }
+
+  // trim inputs
+  email = email.trim();
+  userId = userId.trim();
   
   // Validate tennis center is selected
   if (!tennisCenter) {
