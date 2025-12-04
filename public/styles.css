@@ -1,8 +1,8 @@
 :root {
-    --primary-color: #2ecc71;
+    --primary-color: rgb(31, 160, 219);
     --secondary-color: #3498db;
     --danger-color: #e74c3c;
-    --text-primary: #2c3e50;
+    --text-primary: rgba(27, 69, 128, 1);
     --text-secondary: #7f8c8d;
     --bg-color: #f5f7fa;
     --card-bg: #ffffff;

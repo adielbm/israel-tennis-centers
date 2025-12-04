@@ -1,5 +1,6 @@
 import { AuthService, APIService } from './api.js';
 import { getToday, getNextDays, formatDateDisplay, generateTimeSlotsForDate, formatDate } from './utils.js';
+import { TENNIS_CENTERS } from './constants.js';
 
 // Initialize services
 const authService = new AuthService();
@@ -48,6 +49,9 @@ async function handleLogin(e) {
   // Store credentials
   credentials = { email, userId, tennisCenter };
   localStorage.setItem('credentials', JSON.stringify(credentials));
+  
+  // Update tennis center city display
+  updateTennisCenterDisplay(tennisCenter);
   
   showToast('Logging in...', 'info');
   
@@ -176,18 +180,18 @@ function renderCourtsResults(slots, results, date) {
     timeSlot.className = `time-slot ${isAvailable ? 'available' : 'unavailable'}`;
     
     const courtsInfo = isAvailable 
-      ? `${result.courts.length} court${result.courts.length > 1 ? 's' : ''} available`
-      : 'No courts available';
+      ? `${result.courts.length} מגרש${result.courts.length > 1 ? 'ים' : ''} פנוי${result.courts.length > 1 ? 'ים' : ''}`
+      : 'אין מגרשים פנויים';
     
     const courtTags = isAvailable 
-      ? result.courts.map(num => `<span class="court-tag">Court ${num}</span>`).join('')
+      ? result.courts.map(num => `<span class="court-tag">${num}</span>`).join('')
       : '';
     
     timeSlot.innerHTML = `
       <div class="time-slot-header">
         <div class="time-label">${slot.time}</div>
         <span class="status-badge ${isAvailable ? 'available' : 'unavailable'}">
-          ${isAvailable ? 'Available' : 'Unavailable'}
+          ${isAvailable ? 'פנוי' : 'לא פנוי'}
         </span>
       </div>
       <div class="courts-info">${courtsInfo}</div>
@@ -218,6 +222,17 @@ function handleBack() {
 }
 
 /**
+ * Update tennis center city display
+ */
+function updateTennisCenterDisplay(tennisCenterId) {
+  const center = TENNIS_CENTERS.find(c => c.id === tennisCenterId);
+  const displayElement = document.getElementById('tennis-center-city');
+  if (center && displayElement) {
+    displayElement.textContent = `${center.name}`;
+  }
+}
+
+/**
  * Initialize app
  */
 function init() {
@@ -225,6 +240,7 @@ function init() {
   const storedCredentials = localStorage.getItem('credentials');
   if (storedCredentials && authService.loadFromStorage()) {
     credentials = JSON.parse(storedCredentials);
+    updateTennisCenterDisplay(credentials.tennisCenter);
     showDateSelection();
   }
   

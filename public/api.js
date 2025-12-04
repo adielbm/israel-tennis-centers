@@ -309,32 +309,80 @@ class APIService {
   async searchMultipleSlots(unitId, date, slots) {
     const results = new Map();
 
-    // Process slots in batches of 3 with delays to avoid overwhelming the server
-    const batchSize = 3;
-    for (let i = 0; i < slots.length; i += batchSize) {
-      const batch = slots.slice(i, i + batchSize);
-      
-      const batchPromises = batch.map(async (slot) => {
-        const key = `${formatDate(date)}_${slot.time}`;
-        const availability = await this.searchCourts(unitId, date, slot.time, 1);
-        return { key, availability };
-      });
-
-      const batchResults = await Promise.all(batchPromises);
-      
-      batchResults.forEach(({ key, availability }) => {
-        if (availability) {
-          results.set(key, availability);
-        }
-      });
-
-      // Small delay between batches to be nice to the server
-      if (i + batchSize < slots.length) {
-        await new Promise((resolve) => setTimeout(resolve, 300));
+    try {
+      const tokens = this.authService.getTokens();
+      if (!tokens.sessionId || !tokens.authenticityToken) {
+        throw new Error('Not authenticated');
       }
-    }
 
-    return results;
+      const timeSlots = slots.map(slot => slot.time);
+      const dateStr = formatDate(date);
+
+      // Call the new batch endpoint
+      const response = await fetch(`${WORKER_URL}/api/search-courts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-Cookie': tokens.sessionId,
+        },
+        body: JSON.stringify({
+          unitId,
+          date: dateStr,
+          timeSlots,
+          sessionId: tokens.sessionId,
+          authenticityToken: tokens.authenticityToken,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Convert the results object to a Map with the expected key format
+      Object.entries(data.results).forEach(([timeSlot, availability]) => {
+        const key = `${dateStr}_${timeSlot}`;
+        results.set(key, availability);
+      });
+
+      // Log if results were cached
+      if (data.cached) {
+        console.log('Results retrieved from cache');
+      }
+
+      return results;
+    } catch (error) {
+      console.error('Error in batch search:', error);
+      
+      // Fallback to individual requests if batch fails
+      console.log('Falling back to individual requests...');
+      const batchSize = 3;
+      for (let i = 0; i < slots.length; i += batchSize) {
+        const batch = slots.slice(i, i + batchSize);
+        
+        const batchPromises = batch.map(async (slot) => {
+          const key = `${formatDate(date)}_${slot.time}`;
+          const availability = await this.searchCourts(unitId, date, slot.time, 1);
+          return { key, availability };
+        });
+
+        const batchResults = await Promise.all(batchPromises);
+        
+        batchResults.forEach(({ key, availability }) => {
+          if (availability) {
+            results.set(key, availability);
+          }
+        });
+
+        // Small delay between batches to be nice to the server
+        if (i + batchSize < slots.length) {
+          await new Promise((resolve) => setTimeout(resolve, 300));
+        }
+      }
+
+      return results;
+    }
   }
 }
 
