@@ -1,0 +1,13 @@
+{
+  "name": "itec-cors-proxy",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker CORS proxy for Israel Tennis Centers",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": ["cloudflare", "worker", "cors", "proxy"],
+  "author": "adielbm",
+  "license": "MIT"
+}

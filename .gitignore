@@ -1,0 +1,24 @@
+# Node modules (if any)
+node_modules/
+package-lock.json
+
+# Cloudflare Worker
+api/.wrangler/
+api/wrangler.toml.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local

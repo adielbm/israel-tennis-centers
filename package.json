@@ -1,0 +1,20 @@
+{
+  "name": "israel-tennis-centers",
+  "version": "1.0.0",
+  "description": "Web application for checking Israel Tennis Centers court availability",
+  "type": "module",
+  "scripts": {
+    "dev": "cd public && python3 -m http.server 8000",
+    "worker:dev": "cd api && npm run dev",
+    "worker:deploy": "cd api && npm run deploy"
+  },
+  "keywords": [
+    "tennis",
+    "israel",
+    "courts",
+    "availability"
+  ],
+  "author": "adielbm",
+  "license": "MIT",
+  "main": "index.js"
+}
