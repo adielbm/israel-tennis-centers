@@ -1,4 +1,4 @@
-name = "itec-cors-proxy"
+name = "tennis"
 main = "src/index.js"
 compatibility_date = "2024-12-04"
 

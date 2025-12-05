@@ -2,7 +2,7 @@ import { parseCourtAvailability } from './parser.js';
 import { formatDate, generateTimeSlotsForDate } from './utils.js';
 
 // Get the Cloudflare Worker URL from environment or use default
-const WORKER_URL = 'https://itec-cors-proxy.adiel-bm5.workers.dev';
+const WORKER_URL = 'https://tennis.adielbm.workers.dev';
 
 /**
  * Authentication service

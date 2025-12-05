@@ -190,6 +190,69 @@ header .subtitle {
     gap: 10px;
 }
 
+/* Weekly calendar styles */
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 6px 8px;
+    font-size: 0.95rem;
+}
+
+.date-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.date-cell {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.date-cell:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: var(--primary-color);
+}
+
+.date-cell .date-day {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.date-cell .date-weekday {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
+.date-cell.today {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 6px rgba(31,160,219,0.12);
+}
+
+.date-cell.selected {
+    background: linear-gradient(180deg, rgba(31,160,219,0.12), rgba(31,160,219,0.06));
+    border-color: var(--primary-color);
+}
+
 .date-item {
     padding: 16px;
     border: 2px solid var(--border-color);

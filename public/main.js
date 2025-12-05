@@ -86,20 +86,61 @@ function showDateSelection() {
   
   const dateList = document.getElementById('date-list');
   dateList.innerHTML = '';
-  
   const today = getToday();
-  const dates = getNextDays(today, 14);
-  
-  dates.forEach((date, index) => {
-    let label = formatDateDisplay(date);
-    const dateItem = document.createElement('div');
-    dateItem.className = 'date-item';
-    dateItem.innerHTML = `
-      <div class="date-label">${label}</div>
-    `;
-    dateItem.addEventListener('click', () => showCourts(date));
-    dateList.appendChild(dateItem);
-  });
+
+  // Determine start of week (Sunday) for current week
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay());
+
+  // Build 2 weeks (14 days) starting from startOfWeek
+  const dates = getNextDays(startOfWeek, 14);
+
+  // Create weekday header
+  const weekdaysRow = document.createElement('div');
+  weekdaysRow.className = 'weekdays';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    const weekdayCell = document.createElement('div');
+    weekdayCell.className = 'weekday';
+    weekdayCell.textContent = getWeekday(d);
+    weekdaysRow.appendChild(weekdayCell);
+  }
+  dateList.appendChild(weekdaysRow);
+
+  // Create two week rows of date cells
+  for (let week = 0; week < 2; week++) {
+    const weekRow = document.createElement('div');
+    weekRow.className = 'date-grid';
+    for (let day = 0; day < 7; day++) {
+      const idx = week * 7 + day;
+      const date = dates[idx];
+      const dateCell = document.createElement('button');
+      dateCell.className = 'date-cell';
+      const label = formatDate(date).split('/')[0]; // day number
+      const weekdayLabel = getWeekday(date);
+
+      // Mark today
+      if (date.toDateString() === today.toDateString()) {
+        dateCell.classList.add('today');
+      }
+
+      dateCell.innerHTML = `
+        <div class="date-day">${label}</div>
+        <div class="date-weekday">${weekdayLabel}</div>
+      `;
+
+      dateCell.addEventListener('click', () => {
+        // remove previous selection
+        document.querySelectorAll('.date-cell.selected').forEach(el => el.classList.remove('selected'));
+        dateCell.classList.add('selected');
+        showCourts(date);
+      });
+
+      weekRow.appendChild(dateCell);
+    }
+    dateList.appendChild(weekRow);
+  }
 }
 
 /**
