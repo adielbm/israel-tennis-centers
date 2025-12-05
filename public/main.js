@@ -88,12 +88,17 @@ function showDateSelection() {
   dateList.innerHTML = '';
   const today = getToday();
 
-  // Determine start of week (Sunday) for current week
+  // Get 14 days from today
+  const validDates = getNextDays(today, 14);
+
+  // Determine start of week (Sunday) for the first valid date
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - today.getDay());
 
-  // Build 2 weeks (14 days) starting from startOfWeek
-  const dates = getNextDays(startOfWeek, 14);
+  // Calculate total cells needed (from startOfWeek to last valid date)
+  const lastDate = validDates[validDates.length - 1];
+  const totalDays = Math.ceil((lastDate - startOfWeek) / (1000 * 60 * 60 * 24)) + 1;
+  const totalCells = Math.ceil(totalDays / 7) * 7;
 
   // Create weekday header
   const weekdaysRow = document.createElement('div');
@@ -108,34 +113,45 @@ function showDateSelection() {
   }
   dateList.appendChild(weekdaysRow);
 
-  // Create two week rows of date cells
-  for (let week = 0; week < 2; week++) {
+  // Create week rows with date cells
+  const numWeeks = totalCells / 7;
+  for (let week = 0; week < numWeeks; week++) {
     const weekRow = document.createElement('div');
     weekRow.className = 'date-grid';
     for (let day = 0; day < 7; day++) {
-      const idx = week * 7 + day;
-      const date = dates[idx];
+      const currentDate = new Date(startOfWeek);
+      currentDate.setDate(startOfWeek.getDate() + week * 7 + day);
+      
       const dateCell = document.createElement('button');
       dateCell.className = 'date-cell';
-      const label = formatDate(date).split('/')[0]; // day number
-      const weekdayLabel = getWeekday(date);
+      
+      // Check if this date is in our valid range (today or later, and within 14 days)
+      const isValid = currentDate >= today && currentDate <= lastDate;
+      
+      if (!isValid) {
+        // Empty cell for dates before today or after 14 days
+        dateCell.classList.add('disabled');
+        dateCell.disabled = true;
+        dateCell.innerHTML = `<div class="date-day">&nbsp;</div>`;
+      } else {
+        const label = formatDate(currentDate).split('/')[0]; // day number
 
-      // Mark today
-      if (date.toDateString() === today.toDateString()) {
-        dateCell.classList.add('today');
+        // Mark today
+        if (currentDate.toDateString() === today.toDateString()) {
+          dateCell.classList.add('today');
+        }
+
+        dateCell.innerHTML = `
+          <div class="date-day">${label}</div>
+        `;
+
+        dateCell.addEventListener('click', () => {
+          // remove previous selection
+          document.querySelectorAll('.date-cell.selected').forEach(el => el.classList.remove('selected'));
+          dateCell.classList.add('selected');
+          showCourts(currentDate);
+        });
       }
-
-      dateCell.innerHTML = `
-        <div class="date-day">${label}</div>
-        <div class="date-weekday">${weekdayLabel}</div>
-      `;
-
-      dateCell.addEventListener('click', () => {
-        // remove previous selection
-        document.querySelectorAll('.date-cell.selected').forEach(el => el.classList.remove('selected'));
-        dateCell.classList.add('selected');
-        showCourts(date);
-      });
 
       weekRow.appendChild(dateCell);
     }

@@ -194,42 +194,32 @@ header .subtitle {
 .weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    gap: 5px;
     margin-bottom: 8px;
 }
 
 .weekday {
     text-align: center;
-    font-weight: 700;
-    color: var(--text-secondary);
-    padding: 6px 8px;
-    font-size: 0.95rem;
+    font-size: 10px;
 }
 
 .date-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    gap: 5px;
 }
 
 .date-cell {
-    background: white;
-    border: 2px solid var(--border-color);
+    background: var(--text-primary);
+    color: white;
     border-radius: 10px;
-    padding: 12px 8px;
     cursor: pointer;
     text-align: center;
-    transition: all 0.15s;
     display: flex;
+    font-family: monospace;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-.date-cell:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow);
-    border-color: var(--primary-color);
 }
 
 .date-cell .date-day {
@@ -251,6 +241,19 @@ header .subtitle {
 .date-cell.selected {
     background: linear-gradient(180deg, rgba(31,160,219,0.12), rgba(31,160,219,0.06));
     border-color: var(--primary-color);
+}
+
+.date-cell.disabled {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+    opacity: 0.3;
+}
+
+.date-cell.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: transparent;
 }
 
 .date-item {
