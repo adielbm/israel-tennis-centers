@@ -75,13 +75,12 @@ header {
     padding: 20px 0;
 }
 
-header h1 {
-    font-size: 2rem;
+header h2 {
+    font-size: 1rem;
     margin-bottom: 5px;
 }
 
 header .subtitle {
-    color: var(--text-secondary);
     font-size: 0.95rem;
 }
 
@@ -162,13 +161,10 @@ header .subtitle {
 }
 
 .btn-secondary {
-    background: var(--text-secondary);
+background: gray;
     color: white;
 }
 
-.btn-secondary:hover:not(:disabled) {
-    background: #636e72;
-}
 
 .btn-small {
     padding: 8px 16px;
@@ -259,11 +255,11 @@ header .subtitle {
 
 .date-cell.today {
     border-color: var(--primary-color);
-    box-shadow: 0 2px 6px rgba(31,160,219,0.12);
+    box-shadow: 0 2px 6px rgba(31, 160, 219, 0.12);
 }
 
 .date-cell.selected {
-    background: linear-gradient(180deg, rgba(31,160,219,0.12), rgba(31,160,219,0.06));
+    background: linear-gradient(180deg, rgba(31, 160, 219, 0.12), rgba(31, 160, 219, 0.06));
     border-color: var(--primary-color);
 }
 
@@ -321,7 +317,9 @@ header .subtitle {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .courts-list {
@@ -370,13 +368,13 @@ header .subtitle {
 }
 
 .status-badge.available {
-    background: #d1fae5;
-    color: #065f46;
+    background: #fedb03;
+    color: #1a4580;
 }
 
 .status-badge.unavailable {
-    background: #fee2e2;
-    color: #991b1b;
+    background: #d5d5d5;
+    color: #6d6d6d;
 }
 
 .courts-info {
@@ -396,10 +394,12 @@ header .subtitle {
     padding: 4px 10px;
     background: var(--text-primary);
     color: white;
-    border-radius: 12px;
-    font-size: 0.85rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
     font-weight: 500;
+    width: 2.8em;
     font-family: monospace;
+    text-align: center;
 }
 
 .toast {
@@ -445,11 +445,11 @@ header .subtitle {
     .container {
         padding: 2px;
     }
-    
+
     .card {
         padding: 5px;
     }
-    
+
     header h1 {
         font-size: 1.5rem;
     }

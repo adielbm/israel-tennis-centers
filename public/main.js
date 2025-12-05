@@ -195,7 +195,7 @@ async function showCourts(date) {
     }
     
     // Search for court availability for all slots
-    showToast(`בודק ${slots.length} מגרשים...`, 'info');
+//    showToast(`בודק ${slots.length} מגרשים...`, 'info');
     console.log('Searching for courts with:', { tennisCenter: credentials.tennisCenter, date, slotsCount: slots.length });
     const results = await apiService.searchMultipleSlots(credentials.tennisCenter, date, slots);
     

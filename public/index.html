@@ -6,14 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מרכזי הטניס </title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/png" href="favicon.svg">
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
+    <!-- color -->
+    <meta name="theme-color" content="#3498db">
+
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1>מרכזי הטניס והחינוך בישראל</h1>
+            <p class="subtitle">בדיקת זמינות מגרשים</p>
+            <h2>
+               מרכזי הטניס והחינוך בישראל
+            </h2>
             <div class="tennis-center-selector">
                 <select id="tennis-center-city" class="base-select">
                     <option value="">בחר מרכז טניס...</option>
@@ -37,7 +43,6 @@
                     <option value="13">תל אביב (יד אליהו)</option>
                 </select>
             </div>
-            <p class="subtitle">בדיקת זמינות מגרשים</p>
         </header>
 
         <!-- Login Screen -->
@@ -83,9 +88,9 @@
                     <p>טוען זמינות מגרשים...</p>
                 </div>
                 <div id="courts-list" class="courts-list"></div>
-                <a style="text-decoration: none; display: none;" id="reservation-link"
+                <a style="display: none;" id="reservation-link"
                     class="reservation-link"
-                    href="https://center.tennis.org.il/self_services/court_invitation" target="_blank"
+                    href="https://center.tennis.org.il/self_services/court_invitation" 
                     rel="noopener noreferrer">
                   הזמנת מגרש באתר מרכזי הטניס
     </a>
