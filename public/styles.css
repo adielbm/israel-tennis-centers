@@ -175,6 +175,29 @@ header .subtitle {
     font-size: 0.9rem;
 }
 
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-email {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
 .header-with-logout,
 .header-with-back {
     display: flex;
@@ -195,7 +218,6 @@ header .subtitle {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 5px;
-    margin-bottom: 8px;
 }
 
 .weekday {
@@ -218,8 +240,10 @@ header .subtitle {
     display: flex;
     font-family: monospace;
     flex-direction: column;
+    border: none;
     align-items: center;
     justify-content: center;
+    height: 4em;
 }
 
 .date-cell .date-day {
@@ -423,7 +447,7 @@ header .subtitle {
     }
     
     .card {
-        padding: 10px;
+        padding: 5px;
     }
     
     header h1 {
@@ -435,4 +459,14 @@ header .subtitle {
 #selected-date-title {
     flex-basis: 100%;
     text-align: center;
+}
+
+
+#reservation-link {
+    display: flex;
+    height: 4em;
+    justify-content: center;
+    align-items: stretch;
+    gap: 1em;
+    margin-top: 4em;
 }

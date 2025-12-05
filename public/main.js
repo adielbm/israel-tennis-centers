@@ -84,6 +84,12 @@ async function handleLogin(e) {
 function showDateSelection() {
   navigateToScreen('date-screen');
   
+  // Update user email display
+  const userEmailElement = document.getElementById('user-email');
+  if (userEmailElement && credentials) {
+    userEmailElement.textContent = credentials.email;
+  }
+  
   const dateList = document.getElementById('date-list');
   dateList.innerHTML = '';
   const today = getToday();
