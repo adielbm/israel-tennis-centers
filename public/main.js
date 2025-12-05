@@ -1,5 +1,5 @@
 import { AuthService, APIService } from './api.js';
-import { getToday, getNextDays, formatDateDisplay, generateTimeSlotsForDate, formatDate } from './utils.js';
+import { getToday, getNextDays, formatDateDisplay, generateTimeSlotsForDate, formatDate, getWeekday } from './utils.js';
 import { TENNIS_CENTERS } from './constants.js';
 
 // Initialize services
