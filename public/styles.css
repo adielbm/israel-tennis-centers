@@ -195,7 +195,7 @@ header .subtitle {
 .user-email {
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 0.6rem;
 }
 
 .header-with-logout,
@@ -463,10 +463,8 @@ header .subtitle {
 
 
 #reservation-link {
-    display: flex;
-    height: 4em;
-    justify-content: center;
-    align-items: stretch;
-    gap: 1em;
-    margin-top: 4em;
+    cursor: pointer;
+    margin-top: 5em;
+    font-size: 1.5em;
+    display: block;
 }
