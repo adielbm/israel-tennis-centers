@@ -25,20 +25,26 @@ export default {
     
     // CORS preflight request
     if (request.method === 'OPTIONS') {
-      return handleCORS(env);
+      return handleCORS(env, request);
     }
     
     // Only allow requests from the GitHub Pages origin
     const origin = request.headers.get('Origin');
-    const allowedOrigin = env.ALLOWED_ORIGIN || 'https://adielbm.github.io';
+    const allowedOrigins = [
+      env.ALLOWED_ORIGIN,
+      'https://adielbm.github.io',
+      // 'http://localhost:8000'
+    ].filter(Boolean);
     
-    if (origin && origin !== allowedOrigin) {
+    if (origin && !allowedOrigins.includes(origin)) {
       return new Response('Forbidden', { status: 403 });
     }
     
-    // Handle batch court search endpoint
+    const allowedOrigin = origin || allowedOrigins[0];
+    
+    // Handle court search endpoint (streaming with SSE)
     if (url.pathname === '/api/search-courts' && request.method === 'POST') {
-      return handleBatchCourtSearch(request, env, allowedOrigin);
+      return handleStreamingCourtSearch(request, env, allowedOrigin);
     }
     
     // Extract the path after /proxy/
@@ -135,8 +141,16 @@ export default {
 /**
  * Handle CORS preflight requests
  */
-function handleCORS(env) {
-  const allowedOrigin = env?.ALLOWED_ORIGIN || 'https://adielbm.github.io';
+function handleCORS(env, request) {
+  const origin = request.headers.get('Origin');
+  const allowedOrigins = [
+    env?.ALLOWED_ORIGIN,
+    'https://adielbm.github.io',
+    // 'http://localhost:8000'
+  ].filter(Boolean);
+  
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  
   return new Response(null, {
     status: 204,
     headers: {
@@ -149,9 +163,10 @@ function handleCORS(env) {
 }
 
 /**
- * Handle batch court search request
+ * Handle streaming court search request using Server-Sent Events
+ * Streams results as they arrive for better perceived performance
  */
-async function handleBatchCourtSearch(request, env, allowedOrigin) {
+async function handleStreamingCourtSearch(request, env, allowedOrigin) {
   try {
     const body = await request.json();
     const { unitId, date, timeSlots, sessionId, authenticityToken } = body;
@@ -163,12 +178,13 @@ async function handleBatchCourtSearch(request, env, allowedOrigin) {
       );
     }
     
-    // Check cache first (if KV is available)
+    // Check cache first
     const cacheKey = `courts:${unitId}:${date}`;
     if (env.COURTS_CACHE) {
       const cached = await env.COURTS_CACHE.get(cacheKey, 'json');
       if (cached) {
         console.log(`Cache hit for ${cacheKey}`);
+        // For cached data, send it all at once
         return jsonResponse(
           { ...cached, cached: true },
           { allowedOrigin }
@@ -176,82 +192,135 @@ async function handleBatchCourtSearch(request, env, allowedOrigin) {
       }
     }
     
-    // Fetch court availability for all time slots
-    const results = {};
-    const targetBaseUrl = env.TARGET_BASE_URL || 'https://center.tennis.org.il';
+    // Create a TransformStream for SSE
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+    const encoder = new TextEncoder();
     
-    // Process slots in batches to avoid overwhelming the server
-    const batchSize = 3;
-    for (let i = 0; i < timeSlots.length; i += batchSize) {
-      const batch = timeSlots.slice(i, i + batchSize);
+    // Start streaming in the background
+    (async () => {
+      const results = {};
+      const targetBaseUrl = env.TARGET_BASE_URL || 'https://center.tennis.org.il';
       
-      const batchPromises = batch.map(async (timeSlot) => {
-        const formData = new URLSearchParams();
-        formData.append('utf8', '✓');
-        formData.append('authenticity_token', authenticityToken);
-        formData.append('search[unit_id]', unitId);
-        formData.append('search[court_type]', '1');
-        formData.append('search[start_date]', date);
-        formData.append('search[start_hour]', timeSlot);
-        formData.append('search[duration]', '1');
-        
-        const response = await fetch(`${targetBaseUrl}/self_services/search_court.js`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': sessionId,
-          },
-          body: formData.toString(),
-        });
-        
-        if (!response.ok) {
-          return { timeSlot, error: `HTTP ${response.status}` };
+      const batchSize = 2; 
+      const delayBetweenBatches = 50; 
+      
+      try {
+        for (let i = 0; i < timeSlots.length; i += batchSize) {
+          const batch = timeSlots.slice(i, i + batchSize);
+          
+          const batchPromises = batch.map(async (timeSlot) => {
+            const formData = new URLSearchParams();
+            formData.append('utf8', '✓');
+            formData.append('authenticity_token', authenticityToken);
+            formData.append('search[unit_id]', unitId);
+            formData.append('search[court_type]', '1');
+            formData.append('search[start_date]', date);
+            formData.append('search[start_hour]', timeSlot);
+            formData.append('search[duration]', '1');
+            
+            try {
+              const response = await fetch(`${targetBaseUrl}/self_services/search_court.js`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Cookie': sessionId,
+                },
+                body: formData.toString(),
+              });
+              
+              if (!response.ok) {
+                return { timeSlot, error: `HTTP ${response.status}` };
+              }
+              
+              const responseText = await response.text();
+              const availability = parseCourtAvailability(responseText);
+              
+              return { timeSlot, availability };
+            } catch (error) {
+              return { timeSlot, error: error.message };
+            }
+          });
+          
+          const batchResults = await Promise.all(batchPromises);
+          
+          // Stream each result as it becomes available
+          for (const { timeSlot, availability, error } of batchResults) {
+            if (error) {
+              results[timeSlot] = { status: 'error', error };
+            } else {
+              results[timeSlot] = availability;
+            }
+            
+            // Send SSE event for this time slot
+            const eventData = {
+              type: 'result',
+              timeSlot,
+              data: results[timeSlot]
+            };
+            
+            await writer.write(
+              encoder.encode(`data: ${JSON.stringify(eventData)}\n\n`)
+            );
+          }
+          
+          // Small delay between batches to avoid overwhelming the server
+          if (i + batchSize < timeSlots.length) {
+            await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
+          }
         }
         
-        const responseText = await response.text();
-        const availability = parseCourtAvailability(responseText);
+        // Send completion event
+        const completeData = {
+          type: 'complete',
+          unitId,
+          date,
+          results
+        };
         
-        return { timeSlot, availability };
-      });
-      
-      const batchResults = await Promise.all(batchPromises);
-      
-      batchResults.forEach(({ timeSlot, availability, error }) => {
-        if (error) {
-          results[timeSlot] = { status: 'error', error };
-        } else {
-          results[timeSlot] = availability;
+        await writer.write(
+          encoder.encode(`data: ${JSON.stringify(completeData)}\n\n`)
+        );
+        
+        // Cache the complete results
+        if (env.COURTS_CACHE) {
+          const cacheData = { unitId, date, results, cached: false };
+          await env.COURTS_CACHE.put(
+            cacheKey,
+            JSON.stringify(cacheData),
+            { expirationTtl: CACHE_TTL }
+          );
+          console.log(`Cached results for ${cacheKey}`);
         }
-      });
-      
-      // Small delay between batches
-      if (i + batchSize < timeSlots.length) {
-        await new Promise((resolve) => setTimeout(resolve, 300));
+      } catch (error) {
+        console.error('Streaming error:', error);
+        const errorData = {
+          type: 'error',
+          error: error.message
+        };
+        await writer.write(
+          encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`)
+        );
+      } finally {
+        await writer.close();
       }
-    }
+    })();
     
-    const responseData = {
-      unitId,
-      date,
-      results,
-      cached: false
-    };
-    
-    // Store in cache (if KV is available)
-    if (env.COURTS_CACHE) {
-      await env.COURTS_CACHE.put(
-        cacheKey,
-        JSON.stringify(responseData),
-        { expirationTtl: CACHE_TTL }
-      );
-      console.log(`Cached results for ${cacheKey}`);
-    }
-    
-    return jsonResponse(responseData, { allowedOrigin });
+    // Return SSE response
+    return new Response(readable, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, X-Session-Cookie, X-Auth-Token',
+      },
+    });
   } catch (error) {
-    console.error('Batch search error:', error);
+    console.error('Stream setup error:', error);
     return jsonResponse(
-      { error: `Batch search error: ${error.message}` },
+      { error: `Stream setup error: ${error.message}` },
       { status: 500, allowedOrigin }
     );
   }

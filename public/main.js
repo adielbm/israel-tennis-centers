@@ -194,27 +194,31 @@ async function showCourts(date) {
       return;
     }
     
-    // Search for court availability for all slots
-//    showToast(`בודק ${slots.length} מגרשים...`, 'info');
+    // Search for court availability for all slots with streaming
     console.log('Searching for courts with:', { tennisCenter: credentials.tennisCenter, date, slotsCount: slots.length });
-    const results = await apiService.searchMultipleSlots(credentials.tennisCenter, date, slots);
     
-    console.log('Search completed. Results:', results);
+    // Callback for partial results during streaming
+    const onPartialResult = (results, isComplete) => {
+      // Render results as they arrive
+      renderCourtsResults(slots, results, date);
+      
+      if (isComplete) {
+        console.log('Search completed. Results:', results);
+        document.getElementById('loading-message').style.display = 'none';
+        
+        const availableCount = Array.from(results.values()).filter(r => r.status === 'available').length;
+        if (availableCount > 0) {
+          // Show reservation link
+          const reservationLink = document.getElementById('reservation-link');
+          reservationLink.style.display = 'inline-block';
+          reservationLink.style.marginTop = '30px';
+        } else {
+          showToast('לא נמצאו מגרשים פנויים', 'info');
+        }
+      }
+    };
     
-    document.getElementById('loading-message').style.display = 'none';
-    
-    // Render results
-    renderCourtsResults(slots, results, date);
-    
-    const availableCount = Array.from(results.values()).filter(r => r.status === 'available').length;
-    if (availableCount > 0) {
-      // Show reservation link
-      const reservationLink = document.getElementById('reservation-link');
-      reservationLink.style.display = 'inline-block';
-      reservationLink.style.marginTop = '30px';
-    } else {
-      showToast('לא נמצאו מגרשים פנויים', 'info');
-    }
+    await apiService.searchMultipleSlots(credentials.tennisCenter, date, slots, onPartialResult);
   } catch (error) {
     console.error('Error fetching courts:', error);
     document.getElementById('loading-message').style.display = 'none';
@@ -223,14 +227,9 @@ async function showCourts(date) {
 }
 
 /**
- * Render courts results
+ * Render courts results (supports partial/streaming updates)
  */
 function renderCourtsResults(slots, results, date) {
-  console.log('=== Rendering Courts Results ===');
-  console.log('Total slots to render:', slots.length);
-  console.log('Results map size:', results.size);
-  console.log('Results keys:', Array.from(results.keys()));
-  
   const courtsList = document.getElementById('courts-list');
   courtsList.innerHTML = '';
   
@@ -240,10 +239,17 @@ function renderCourtsResults(slots, results, date) {
     const key = `${formattedDate}_${slot.time}`;
     const result = results.get(key);
     
-    console.log(`Slot ${slot.time}: key="${key}", found=${!!result}`);
-    
+    // If no result yet, show loading state
     if (!result) {
-      console.warn(`No result found for slot ${slot.time} with key ${key}`);
+      const timeSlot = document.createElement('div');
+      timeSlot.className = 'time-slot loading';
+      timeSlot.innerHTML = `
+        <div class="time-slot-header">
+          <div class="time-label">${slot.time}</div>
+        </div>
+        <div class="status-badge loading">בודק...</div>
+      `;
+      courtsList.appendChild(timeSlot);
       return;
     }
     

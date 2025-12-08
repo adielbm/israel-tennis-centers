@@ -301,11 +301,6 @@ background: gray;
     font-size: 0.9rem;
 }
 
-.loading {
-    text-align: center;
-    padding: 40px 20px;
-}
-
 .spinner {
     width: 40px;
     height: 40px;
@@ -329,8 +324,8 @@ background: gray;
 }
 
 .time-slot {
-    padding-bottom: 8px;
-    border-bottom: 3px solid #3498db;
+    padding-bottom: 6px;
+        border-bottom: 2px solid #1a4580;
     display: grid;
     grid-template-columns: 1fr 130px;
 }
@@ -342,6 +337,10 @@ background: gray;
 
 .time-slot.unavailable {
     color: #969696;
+}
+
+.time-slot.loading {
+    opacity: 0.6;
 }
 
 .time-slot-header {
@@ -368,13 +367,27 @@ background: gray;
 }
 
 .status-badge.available {
-    background: #fedb03;
     color: #1a4580;
 }
 
 .status-badge.unavailable {
-    background: #d5d5d5;
-    color: #6d6d6d;
+    background: #ffd8d8;
+    color: #ff0000;
+}
+
+.status-badge.loading {
+    background: #c5c5c5;
+    color: #000000;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
 .courts-info {
@@ -392,12 +405,12 @@ background: gray;
 
 .court-tag {
     padding: 4px 10px;
-    background: var(--text-primary);
+    background: #00a58a;
     color: white;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    width: 2.8em;
+    border-radius: 3px;
+    font-size: 1rem;
+    font-weight: bold;
+    width: 2.9em;
     font-family: monospace;
     text-align: center;
 }

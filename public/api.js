@@ -1,5 +1,4 @@
-import { parseCourtAvailability } from './parser.js';
-import { formatDate, generateTimeSlotsForDate } from './utils.js';
+import { formatDate } from './utils.js';
 
 // Get the Cloudflare Worker URL from environment or use default
 const WORKER_URL = 'https://tennis.adielbm.workers.dev';
@@ -263,50 +262,12 @@ class APIService {
     return filteredSlots;
   }
 
-  /**
-   * Search for available courts
-   */
-  async searchCourts(unitId, date, startHour, duration = 1) {
-    try {
-      const tokens = this.authService.getTokens();
-      if (!tokens.sessionId || !tokens.authenticityToken) {
-        throw new Error('Not authenticated');
-      }
-
-      const formData = new URLSearchParams();
-      formData.append('utf8', '✓');
-      formData.append('authenticity_token', tokens.authenticityToken);
-      formData.append('search[unit_id]', unitId);
-      formData.append('search[court_type]', '1');
-      formData.append('search[start_date]', formatDate(date));
-      formData.append('search[start_hour]', startHour);
-      formData.append('search[duration]', duration.toString());
-
-      const response = await fetch(`${WORKER_URL}/proxy/self_services/search_court.js`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-Session-Cookie': tokens.sessionId,
-        },
-        body: formData.toString(),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const responseText = await response.text();
-      return parseCourtAvailability(responseText);
-    } catch (error) {
-      console.error('Error searching courts:', error);
-      return null;
-    }
-  }
 
   /**
-   * Search for courts across multiple time slots with rate limiting
+   * Search for courts across multiple time slots with streaming
+   * Accepts a callback function that receives partial results as they arrive
    */
-  async searchMultipleSlots(unitId, date, slots) {
+  async searchMultipleSlots(unitId, date, slots, onPartialResult = null) {
     const results = new Map();
 
     try {
@@ -318,7 +279,7 @@ class APIService {
       const timeSlots = slots.map(slot => slot.time);
       const dateStr = formatDate(date);
 
-      // Call the new batch endpoint
+      // Call the streaming endpoint
       const response = await fetch(`${WORKER_URL}/api/search-courts`, {
         method: 'POST',
         headers: {
@@ -338,49 +299,80 @@ class APIService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      // Check if the response is SSE (streaming) or JSON (cached)
+      const contentType = response.headers.get('Content-Type');
       
-      // Convert the results object to a Map with the expected key format
-      Object.entries(data.results).forEach(([timeSlot, availability]) => {
-        const key = `${dateStr}_${timeSlot}`;
-        results.set(key, availability);
-      });
+      if (contentType && contentType.includes('text/event-stream')) {
+        // Handle SSE streaming
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
 
-      // Log if results were cached
-      if (data.cached) {
-        console.log('Results retrieved from cache');
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          
+          // Process complete SSE messages
+          const lines = buffer.split('\n\n');
+          buffer = lines.pop() || ''; // Keep incomplete message in buffer
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = JSON.parse(line.slice(6));
+              
+              if (data.type === 'result') {
+                // Add result to map
+                const key = `${dateStr}_${data.timeSlot}`;
+                results.set(key, data.data);
+                
+                // Call callback with partial results if provided
+                if (onPartialResult) {
+                  onPartialResult(results, false);
+                }
+              } else if (data.type === 'complete') {
+                // Stream complete, update with final results
+                Object.entries(data.results).forEach(([timeSlot, availability]) => {
+                  const key = `${dateStr}_${timeSlot}`;
+                  results.set(key, availability);
+                });
+                
+                // Call callback one final time with complete flag
+                if (onPartialResult) {
+                  onPartialResult(results, true);
+                }
+              } else if (data.type === 'error') {
+                console.error('Streaming error:', data.error);
+              }
+            }
+          }
+        }
+      } else {
+        // Handle JSON response (cached results)
+        const data = await response.json();
+        
+        // Convert the results object to a Map with the expected key format
+        Object.entries(data.results).forEach(([timeSlot, availability]) => {
+          const key = `${dateStr}_${timeSlot}`;
+          results.set(key, availability);
+        });
+
+        // Log if results were cached
+        if (data.cached) {
+          console.log('Results retrieved from cache');
+        }
+        
+        // Call callback with complete results
+        if (onPartialResult) {
+          onPartialResult(results, true);
+        }
       }
 
       return results;
     } catch (error) {
-      console.error('Error in batch search:', error);
-      
-      // Fallback to individual requests if batch fails
-      console.log('Falling back to individual requests...');
-      const batchSize = 3;
-      for (let i = 0; i < slots.length; i += batchSize) {
-        const batch = slots.slice(i, i + batchSize);
-        
-        const batchPromises = batch.map(async (slot) => {
-          const key = `${formatDate(date)}_${slot.time}`;
-          const availability = await this.searchCourts(unitId, date, slot.time, 1);
-          return { key, availability };
-        });
-
-        const batchResults = await Promise.all(batchPromises);
-        
-        batchResults.forEach(({ key, availability }) => {
-          if (availability) {
-            results.set(key, availability);
-          }
-        });
-
-        // Small delay between batches to be nice to the server
-        if (i + batchSize < slots.length) {
-          await new Promise((resolve) => setTimeout(resolve, 300));
-        }
-      }
-
+      console.error('Search error:', error);
       return results;
     }
   }
