@@ -302,15 +302,78 @@ function updateTennisCenterDisplay(tennisCenterId) {
 }
 
 /**
+ * Parse date from URL parameter
+ * Accepts formats: YYYY-MM-DD, DD/MM/YYYY
+ */
+function parseDateFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const dateParam = urlParams.get('date');
+  
+  if (!dateParam) {
+    return null;
+  }
+  
+  let date;
+  
+  // Try parsing YYYY-MM-DD format (ISO)
+  if (dateParam.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    date = new Date(dateParam);
+  }
+  // Try parsing DD/MM/YYYY format
+  else if (dateParam.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+    const [day, month, year] = dateParam.split('/');
+    date = new Date(year, month - 1, day);
+  }
+  else {
+    console.error('Invalid date format in URL. Use YYYY-MM-DD or DD/MM/YYYY');
+    return null;
+  }
+  
+  // Validate date is valid
+  if (isNaN(date.getTime())) {
+    console.error('Invalid date in URL');
+    return null;
+  }
+  
+  // Validate date is in the future (or today)
+  const today = getToday();
+  if (date < today) {
+    console.error('Date in URL is in the past');
+    return null;
+  }
+  
+  // Validate date is within 14 days
+  const maxDate = new Date(today);
+  maxDate.setDate(today.getDate() + 14);
+  if (date > maxDate) {
+    console.error('Date in URL is too far in the future (max 14 days)');
+    return null;
+  }
+  
+  return date;
+}
+
+/**
  * Initialize app
  */
 function init() {
   // Check if already logged in
   const storedCredentials = localStorage.getItem('credentials');
+  const urlDate = parseDateFromURL();
+  
   if (storedCredentials && authService.loadFromStorage()) {
     credentials = JSON.parse(storedCredentials);
     updateTennisCenterDisplay(credentials.tennisCenter);
-    showDateSelection();
+    
+    // If date is provided in URL, go directly to courts screen
+    if (urlDate) {
+      showCourts(urlDate);
+    } else {
+      showDateSelection();
+    }
+  } else if (urlDate) {
+    // If date is provided but not logged in, show toast
+    showToast('יש להתחבר תחילה', 'error');
   }
   
   // Event listeners
