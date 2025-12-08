@@ -11,6 +11,21 @@
     --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: rgb(52, 180, 235);
+        --secondary-color: #52a8db;
+        --danger-color: #ff6b6b;
+        --text-primary: rgba(220, 230, 245, 1);
+        --text-secondary: #a0aab5;
+        --bg-color: #1a1d23;
+        --card-bg: #2a2d35;
+        --border-color: #3a3d45;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -35,7 +50,7 @@ body {
 
 #tennis-center-city.base-select {
     background: var(--text-primary);
-    color: white;
+    color: var(--card-bg);
     border-radius: 1em;
     padding: 0.5em 1em;
     border: 2px solid var(--primary-color);
@@ -51,14 +66,27 @@ body {
     border-color: rgb(31, 180, 239);
 }
 
+@media (prefers-color-scheme: dark) {
+    #tennis-center-city.base-select:hover {
+        background: rgb(40, 140, 190);
+        border-color: rgb(52, 180, 235);
+    }
+}
+
 #tennis-center-city.base-select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(31, 160, 219, 0.2);
 }
 
+@media (prefers-color-scheme: dark) {
+    #tennis-center-city.base-select:focus {
+        box-shadow: 0 0 0 3px rgba(52, 180, 235, 0.3);
+    }
+}
+
 #tennis-center-city.base-select option {
-    background: white;
+    background: var(--card-bg);
     color: var(--text-primary);
     padding: 10px;
 }
@@ -150,7 +178,7 @@ header .subtitle {
 
 .btn-primary {
     background: var(--primary-color);
-    color: white;
+    color: var(--card-bg);
     width: 100%;
 }
 
@@ -160,9 +188,15 @@ header .subtitle {
     box-shadow: var(--shadow-hover);
 }
 
+@media (prefers-color-scheme: dark) {
+    .btn-primary:hover:not(:disabled) {
+        background: #2ecc71;
+    }
+}
+
 .btn-secondary {
-background: gray;
-    color: white;
+    background: #6c757d;
+    color: var(--card-bg);
 }
 
 
@@ -177,7 +211,7 @@ background: gray;
     align-items: center;
     margin-bottom: 15px;
     padding: 12px 16px;
-    background: white;
+    background: var(--card-bg);
     border-radius: 8px;
     box-shadow: var(--shadow);
 }
@@ -229,7 +263,7 @@ background: gray;
 
 .date-cell {
     background: var(--text-primary);
-    color: white;
+    color: var(--card-bg);
     border-radius: 10px;
     cursor: pointer;
     text-align: center;
@@ -249,8 +283,14 @@ background: gray;
 
 .date-cell .date-weekday {
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: rgba(128, 128, 128, 0.8);
     margin-top: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .date-cell .date-weekday {
+        color: rgba(160, 170, 181, 0.8);
+    }
 }
 
 .date-cell.today {
@@ -282,7 +322,7 @@ background: gray;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
-    background: white;
+    background: var(--card-bg);
 }
 
 .date-item:hover {
@@ -325,7 +365,7 @@ background: gray;
 
 .time-slot {
     padding-bottom: 6px;
-        border-bottom: 2px solid #1a4580;
+    border-bottom: 2px solid var(--text-primary);
     display: grid;
     grid-template-columns: 1fr 130px;
 }
@@ -337,6 +377,12 @@ background: gray;
 
 .time-slot.unavailable {
     color: #969696;
+}
+
+@media (prefers-color-scheme: dark) {
+    .time-slot.unavailable {
+        color: #888888;
+    }
 }
 
 .time-slot.loading {
@@ -367,7 +413,7 @@ background: gray;
 }
 
 .status-badge.available {
-    color: #1a4580;
+    color: var(--text-primary);
 }
 
 .status-badge.unavailable {
@@ -375,10 +421,24 @@ background: gray;
     color: #ff0000;
 }
 
+@media (prefers-color-scheme: dark) {
+    .status-badge.unavailable {
+        background: #4a2020;
+        color: #ff6b6b;
+    }
+}
+
 .status-badge.loading {
     background: #c5c5c5;
     color: #000000;
     animation: pulse 1.5s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+    .status-badge.loading {
+        background: #4a4a4a;
+        color: #e0e0e0;
+    }
 }
 
 @keyframes pulse {
@@ -406,13 +466,19 @@ background: gray;
 .court-tag {
     padding: 4px 10px;
     background: #00a58a;
-    color: white;
+    color: var(--card-bg);
     border-radius: 3px;
     font-size: 1rem;
     font-weight: bold;
     width: 2.9em;
     font-family: monospace;
     text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+    .court-tag {
+        background: #00c9a7;
+    }
 }
 
 .toast {
@@ -422,7 +488,7 @@ background: gray;
     transform: translateX(-50%);
     padding: 16px 24px;
     background: var(--text-primary);
-    color: white;
+    color: var(--card-bg);
     border-radius: 8px;
     box-shadow: var(--shadow-hover);
     opacity: 0;
