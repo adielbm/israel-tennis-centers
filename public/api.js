@@ -12,7 +12,7 @@ class WeatherService {
    * @param {number} lat - Latitude
    * @param {number} lng - Longitude
    * @param {Date} date - Date to fetch weather for
-   * @returns {Promise<Object>} Weather data with hourly temperature and precipitation
+   * @returns {Promise<Object>} Weather data with hourly temperature, precipitation probability, and wind speed
    */
   async getHourlyWeather(lat, lng, date) {
     try {
@@ -21,7 +21,7 @@ class WeatherService {
       nextDay.setDate(date.getDate() + 1);
       const endDateStr = nextDay.toISOString().split('T')[0];
       
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,precipitation&timezone=auto&start_date=${dateStr}&end_date=${endDateStr}`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&timezone=auto&start_date=${dateStr}&end_date=${endDateStr}`;
       
       const response = await fetch(url);
       if (!response.ok) {
@@ -42,7 +42,8 @@ class WeatherService {
             hourlyData.push({
               hour: timeObj.getHours(),
               temperature: data.hourly.temperature_2m[i],
-              precipitation: data.hourly.precipitation[i]
+              precipitationProbability: data.hourly.precipitation_probability[i],
+              windSpeed: data.hourly.wind_speed_10m[i]
             });
           }
         }

@@ -266,7 +266,8 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
           <div class="time-label">${slot.time}</div>
           ${weather ? `<div class="weather-info">
             <span class="temp">${Math.round(weather.temperature)}°C</span>
-            ${weather.precipitation > 0 ? `<span class="precip">💧 ${weather.precipitation}mm</span>` : ''}
+            ${weather.precipitationProbability > 0 ? `<span class="precip">💧 ${weather.precipitationProbability}%</span>` : ''}
+            ${weather.windSpeed >= 20 ? `<span class="wind">🌬️ ${Math.round(weather.windSpeed)} km/h</span>` : ''}
           </div>` : ''}
         </div>
         <div class="status-badge loading">בודק</div>
@@ -293,7 +294,8 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
         <div class="time-label">${slot.time}</div>
         ${weather ? `<div class="weather-info">
           <span class="temp">${Math.round(weather.temperature)}°C</span>
-          ${weather.precipitation > 0 ? `<span class="precip">💧 ${weather.precipitation}mm</span>` : ''}
+          ${weather.precipitationProbability > 0 ? `<span class="precip">💧 ${weather.precipitationProbability}%</span>` : ''}
+          ${weather.windSpeed >= 20 ? `<span class="wind">🌬️ ${Math.round(weather.windSpeed)} km/h</span>` : ''}
         </div>` : ''}
       </div>
       <div class="status-badge ${isAvailable ? 'available' : 'unavailable'}">${courtsInfo}</div>

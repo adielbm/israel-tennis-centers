@@ -330,9 +330,11 @@ header h2 {
 .time-slot-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 8px;
+    gap: 0 2em;
     flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .time-label {
@@ -358,6 +360,11 @@ header h2 {
 .weather-info .precip {
     color: #4a9eff;
     font-weight: 500;
+}
+
+.weather-info .wind {
+    color: #ff9500;
+    font-weight: 600;
 }
 
 .status-badge {
