@@ -349,12 +349,19 @@ header h2 {
     align-items: center;
     font-size: 0.9rem;
     font-family: "Google Sans Code";
-    color: var(--text-color);
     margin-left: auto;
 }
 
 .weather-info .temp {
     font-weight: 600;
+    color: var(--text-color);
+}
+
+.weather-info .precip,
+.weather-info .wind {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .weather-info .precip {
@@ -365,6 +372,11 @@ header h2 {
 .weather-info .wind {
     color: #ff9500;
     font-weight: 600;
+}
+
+.weather-info .material-symbols-outlined {
+    font-size: 18px;
+    vertical-align: middle;
 }
 
 .status-badge {
@@ -479,12 +491,12 @@ background: var(--green);
 
 #reservation-link {
     cursor: pointer;
-    margin: 1em;
+    margin: 1em auto;
     font-size: 1em;
     display: block;
     text-align: center;
-    background: var(--text-color);
-    color: var(--bg-color);
+    background: var(--bg-color);
+    color: var(--text-color);
     text-decoration: none;
     padding: 1em;
 }

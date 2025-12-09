@@ -218,12 +218,7 @@ async function showCourts(date) {
         console.log('Search completed. Results:', results);
         
         const availableCount = Array.from(results.values()).filter(r => r.status === 'available').length;
-        if (availableCount > 0) {
-          // Show reservation link
-          const reservationLink = document.getElementById('reservation-link');
-          reservationLink.style.display = 'inline-block';
-          reservationLink.style.marginTop = '30px';
-        } else {
+        if (availableCount === 0) {
           showToast('לא נמצאו מגרשים פנויים', 'info');
         }
       }
@@ -266,8 +261,8 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
           <div class="time-label">${slot.time}</div>
           ${weather ? `<div class="weather-info">
             <span class="temp">${Math.round(weather.temperature)}°C</span>
-            ${weather.precipitationProbability > 0 ? `<span class="precip">💧 ${weather.precipitationProbability}%</span>` : ''}
-            ${weather.windSpeed >= 20 ? `<span class="wind">🌬️ ${Math.round(weather.windSpeed)} km/h</span>` : ''}
+            ${weather.precipitationProbability > 0 ? `<span class="precip"><span class="material-symbols-outlined">rainy</span> ${weather.precipitationProbability}%</span>` : ''}
+            ${weather.windSpeed >= 20 ? `<span class="wind"><span class="material-symbols-outlined">air</span> ${Math.round(weather.windSpeed)} km/h</span>` : ''}
           </div>` : ''}
         </div>
         <div class="status-badge loading">בודק</div>
@@ -294,8 +289,8 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
         <div class="time-label">${slot.time}</div>
         ${weather ? `<div class="weather-info">
           <span class="temp">${Math.round(weather.temperature)}°C</span>
-          ${weather.precipitationProbability > 0 ? `<span class="precip">💧 ${weather.precipitationProbability}%</span>` : ''}
-          ${weather.windSpeed >= 20 ? `<span class="wind">🌬️ ${Math.round(weather.windSpeed)} km/h</span>` : ''}
+          ${weather.precipitationProbability > 0 ? `<span class="precip"><span class="material-symbols-outlined">rainy</span> ${weather.precipitationProbability}%</span>` : ''}
+          ${weather.windSpeed >= 20 ? `<span class="wind"><span class="material-symbols-outlined">air</span> ${Math.round(weather.windSpeed)} km/h</span>` : ''}
         </div>` : ''}
       </div>
       <div class="status-badge ${isAvailable ? 'available' : 'unavailable'}">${courtsInfo}</div>
