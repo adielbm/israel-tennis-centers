@@ -315,7 +315,7 @@ header h2 {
     padding-bottom: 6px;
     border-bottom: 2px solid var(--border-color);
     display: grid;
-    grid-template-columns: 1fr 130px;
+    grid-template-columns: 1fr 40px;
 }
 
 .time-slot.available {
@@ -345,7 +345,7 @@ header h2 {
 
 .weather-info {
     display: flex;
-    gap: 12px;
+    gap: 20px;
     align-items: center;
     font-size: 0.9rem;
     font-family: "Google Sans Code";

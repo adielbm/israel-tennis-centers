@@ -262,7 +262,7 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
           ${weather ? `<div class="weather-info">
             <span class="temp">${Math.round(weather.temperature)}°C</span>
             ${weather.precipitationProbability > 0 ? `<span class="precip"><span class="material-symbols-outlined">rainy</span> ${weather.precipitationProbability}%</span>` : ''}
-            ${weather.windSpeed >= 20 ? `<span class="wind"><span class="material-symbols-outlined">air</span> ${Math.round(weather.windSpeed)} km/h</span>` : ''}
+            ${weather.windSpeed >= 20 ? `<span class="wind"><span class="material-symbols-outlined">air</span><span style="direction: ltr;">${Math.round(weather.windSpeed)}  km/h</span></span>` : ''}
           </div>` : ''}
         </div>
         <div class="status-badge loading">בודק</div>
@@ -277,7 +277,7 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
     timeSlot.className = `time-slot ${isAvailable ? 'available' : 'unavailable'}`;
     
     const courtsInfo = isAvailable 
-      ? `${result.courts.length} מגרש${result.courts.length > 1 ? 'ים' : ''} פנוי${result.courts.length > 1 ? 'ים' : ''}`
+      ? `${result.courts.length} מגרש${result.courts.length > 1 ? 'ים' : ''}`
       : 'תפוס';
     
     const courtTags = isAvailable 
