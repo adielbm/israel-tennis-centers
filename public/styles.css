@@ -4,7 +4,7 @@
 /* light mode styles */
 @media (prefers-color-scheme: light) {
     :root {
-        --bg-color: #eeeeee;
+        --bg-color: #cfe5d9;
         --text-color: #0021d7;
         --button-color: #006fc4;
         --text-button-color: #ffffff;
