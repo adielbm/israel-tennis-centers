@@ -197,6 +197,13 @@ async function showCourts(date) {
     
     // Callback for partial results during streaming
     const onPartialResult = (results, isComplete) => {
+
+      // hide loading-message
+      const loadingMessage = document.getElementById('loading-message');
+      if (loadingMessage) {
+        loadingMessage.style.display = 'none';
+      }
+
       // Render results as they arrive
       renderCourtsResults(slots, results, date);
       
@@ -218,6 +225,10 @@ async function showCourts(date) {
     await apiService.searchMultipleSlots(credentials.tennisCenter, date, slots, onPartialResult);
   } catch (error) {
     console.error('Error fetching courts:', error);
+      const loadingMessage = document.getElementById('loading-message');
+      if (loadingMessage) {
+        loadingMessage.style.display = 'none';
+      }
     showToast('שגיאה בטעינת המגרשים', 'error');
   }
 }
@@ -243,7 +254,7 @@ function renderCourtsResults(slots, results, date) {
         <div class="time-slot-header">
           <div class="time-label">${slot.time}</div>
         </div>
-        <div class="status-badge loading">בודק...</div>
+        <div class="status-badge loading">בודק</div>
       `;
       courtsList.appendChild(timeSlot);
       return;

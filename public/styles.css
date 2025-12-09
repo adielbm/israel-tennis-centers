@@ -5,11 +5,11 @@
 @media (prefers-color-scheme: light) {
     :root {
         --bg-color: #eeeeee;
-        --text-color: #0c1540;
+        --text-color: #0021d7;
         --button-color: #006fc4;
         --text-button-color: #ffffff;
         --border-color: #535353;
-        --green: #27ae60;
+        --green: #a1ffc9;
         --red: #e74c3c;
         --gray: #c1c1c1;
     }
@@ -17,13 +17,13 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --bg-color: rgb(19, 19, 19);
-        --text-color: #dfdfdf;
+        --bg-color: rgb(0 0 0);
+        --text-color: #00ffd9;
         --button-color: #0089d3;
-        --text-button-color: #373737;
+        --text-button-color: #151515;
         --border-color: #b1b1b1;
-        --green: #27ae60;
-        --red: #e74c3c;
+        --green: #003d35;
+        --red: #ff7668;
         --gray: #656565;
     }
 }
@@ -156,8 +156,8 @@ header h2 {
 }
 
 .btn-secondary {
-    background: var(--gray);
-    color: var(--text-button-color);
+    background: var(--bg-color);
+    color: var(--text-color);
 }
 
 
@@ -221,8 +221,8 @@ header h2 {
 }
 
 .date-cell {
-    background: var(--text-color);
-    color: var(--text-button-color);
+    background: var(--bg-color);
+    color: var(--text-color);
     cursor: pointer;
     text-align: center;
     display: flex;
@@ -236,6 +236,7 @@ header h2 {
 
 .date-cell .date-day {
     font-size: 1.25rem;
+    font-family: "Google Sans Code";
     font-weight: 700;
 }
 
@@ -312,7 +313,7 @@ header h2 {
 
 .time-slot {
     padding-bottom: 6px;
-    border-bottom: 2px solid var(--text-color);
+    border-bottom: 2px solid var(--border-color);
     display: grid;
     grid-template-columns: 1fr 130px;
 }
@@ -324,10 +325,6 @@ header h2 {
 
 .time-slot.unavailable {
     color: var(--gray);
-}
-
-.time-slot.loading {
-    opacity: 0.6;
 }
 
 .time-slot-header {
@@ -348,7 +345,7 @@ header h2 {
     display: flex;
     text-align: center;
     font-weight: 500;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
 }
 
@@ -357,26 +354,19 @@ header h2 {
 }
 
 .status-badge.unavailable {
-    background: var(--bg-color);
     color: var(--red);
 }
 
-.status-badge.loading {
-    background: var(--gray);
-    color: var(--text-color);
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
+.status-badge.loading:after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    border: 2px solid var(--text-color);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
 .courts-info {
@@ -385,22 +375,21 @@ header h2 {
 }
 
 .court-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    display: grid;
+    gap: 0.4em;
     grid-column: span 2;
     margin-top: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(3em, 1fr));
 }
 
 .court-tag {
-    padding: 4px 10px;
-    background: var(--green);
-    color: var(--text-button-color);
-    font-size: 1rem;
-    font-weight: bold;
-    width: 2.9em;
+background: var(--green);
+    color: var(--text-color);
     font-family: "Google Sans Code";
-    text-align: center;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .toast {
@@ -463,7 +452,12 @@ header h2 {
 
 #reservation-link {
     cursor: pointer;
-    margin-top: 5em;
-    font-size: 1.5em;
+    margin: 1em;
+    font-size: 1em;
     display: block;
+    text-align: center;
+    background: var(--text-color);
+    color: var(--bg-color);
+    text-decoration: none;
+    padding: 1em;
 }
