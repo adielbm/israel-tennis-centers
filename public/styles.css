@@ -247,7 +247,7 @@ header h2 {
 }
 
 .date-cell.today {
-    border-color: var(--button-color);
+    background: var(--green);
 }
 
 .date-cell.selected {
@@ -352,11 +352,6 @@ header h2 {
     margin-left: auto;
 }
 
-.weather-info .temp {
-    font-weight: 600;
-    color: var(--text-color);
-}
-
 .weather-info .precip,
 .weather-info .wind {
     display: flex;
@@ -364,15 +359,7 @@ header h2 {
     gap: 4px;
 }
 
-.weather-info .precip {
-    color: #4a9eff;
-    font-weight: 500;
-}
 
-.weather-info .wind {
-    color: #ff9500;
-    font-weight: 600;
-}
 
 .weather-info .material-symbols-outlined {
     font-size: 18px;
