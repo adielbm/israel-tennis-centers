@@ -1,27 +1,45 @@
-:root {
-    --primary-color: rgb(31, 160, 219);
-    --secondary-color: #3498db;
-    --danger-color: #e74c3c;
-    --text-primary: rgba(27, 69, 128, 1);
-    --text-secondary: #7f8c8d;
-    --bg-color: #f5f7fa;
-    --card-bg: #ffffff;
-    --border-color: #dfe6e9;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+@import url('https://fonts.googleapis.com/css2?family=Miriam+Libre:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap');
+
+/* light mode styles */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-color: #eeeeee;
+        --text-color: #0c1540;
+        --button-color: #006fc4;
+        --text-button-color: #ffffff;
+        --border-color: #535353;
+        --green: #27ae60;
+        --red: #e74c3c;
+        --gray: #c1c1c1;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: rgb(19, 19, 19);
+        --text-color: #dfdfdf;
+        --button-color: #0089d3;
+        --text-button-color: #373737;
+        --border-color: #b1b1b1;
+        --green: #27ae60;
+        --red: #e74c3c;
+        --gray: #656565;
+    }
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: "Miriam Libre";
 }
 
+
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     background: var(--bg-color);
-    color: var(--text-primary);
+    color: var(--text-color);
     line-height: 1.6;
     min-height: 100vh;
     direction: rtl;
@@ -34,32 +52,16 @@ body {
 }
 
 #tennis-center-city.base-select {
-    background: var(--text-primary);
-    color: white;
-    border-radius: 1em;
+    background: var(--bg-color);
+    color: var(--text-color);
     padding: 0.5em 1em;
-    border: 2px solid var(--primary-color);
-    font-size: 18px;
-    font-weight: 600;
     cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-}
-
-#tennis-center-city.base-select:hover {
-    background: rgb(25, 120, 165);
-    border-color: rgb(31, 180, 239);
-}
-
-#tennis-center-city.base-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(31, 160, 219, 0.2);
+    border: 2px solid var(--border-color);
 }
 
 #tennis-center-city.base-select option {
-    background: white;
-    color: var(--text-primary);
+    background: var(--text-button-color);
+    color: var(--text-color);
     padding: 10px;
 }
 
@@ -80,10 +82,6 @@ header h2 {
     margin-bottom: 5px;
 }
 
-header .subtitle {
-    font-size: 0.95rem;
-}
-
 .screen {
     display: none;
 }
@@ -93,10 +91,15 @@ header .subtitle {
 }
 
 .card {
-    background: var(--card-bg);
-    border-radius: 12px;
+    background: var(--text-button-color);
+    border: 2px solid var(--border-color);
     padding: 30px;
-    box-shadow: var(--shadow);
+}
+
+@media (max-width: 400px) {
+    .card {
+        border: none;
+    }
 }
 
 .card h2 {
@@ -112,7 +115,7 @@ header .subtitle {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--text-color);
 }
 
 .form-group input,
@@ -120,22 +123,20 @@ header .subtitle {
     width: 100%;
     padding: 12px;
     border: 2px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 18px;
+    background: var(--bg-color);
+    color: var(--text-color);
     transition: border-color 0.2s;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: var(--button-color);
 }
 
 .btn {
     padding: 12px 24px;
     border: none;
-    border-radius: 8px;
-    font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -149,20 +150,14 @@ header .subtitle {
 }
 
 .btn-primary {
-    background: var(--primary-color);
-    color: white;
+    background: var(--button-color);
+    color: var(--text-button-color);
     width: 100%;
 }
 
-.btn-primary:hover:not(:disabled) {
-    background: #27ae60;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-hover);
-}
-
 .btn-secondary {
-background: gray;
-    color: white;
+    background: var(--gray);
+    color: var(--text-button-color);
 }
 
 
@@ -177,9 +172,7 @@ background: gray;
     align-items: center;
     margin-bottom: 15px;
     padding: 12px 16px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
+    background: var(--text-button-color);
 }
 
 .user-info {
@@ -190,7 +183,7 @@ background: gray;
 
 .user-email {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-color);
     font-size: 0.6rem;
 }
 
@@ -228,13 +221,12 @@ background: gray;
 }
 
 .date-cell {
-    background: var(--text-primary);
-    color: white;
-    border-radius: 10px;
+    background: var(--text-color);
+    color: var(--text-button-color);
     cursor: pointer;
     text-align: center;
     display: flex;
-    font-family: monospace;
+    font-family: "Google Sans Code";
     flex-direction: column;
     border: none;
     align-items: center;
@@ -249,18 +241,17 @@ background: gray;
 
 .date-cell .date-weekday {
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: var(--gray);
     margin-top: 6px;
 }
 
 .date-cell.today {
-    border-color: var(--primary-color);
-    box-shadow: 0 2px 6px rgba(31, 160, 219, 0.12);
+    border-color: var(--button-color);
 }
 
 .date-cell.selected {
-    background: linear-gradient(180deg, rgba(31, 160, 219, 0.12), rgba(31, 160, 219, 0.06));
-    border-color: var(--primary-color);
+    background: var(--button-color);
+    border-color: var(--button-color);
 }
 
 .date-cell.disabled {
@@ -272,23 +263,19 @@ background: gray;
 
 .date-cell.disabled:hover {
     transform: none;
-    box-shadow: none;
     border-color: transparent;
 }
 
 .date-item {
     padding: 16px;
     border: 2px solid var(--border-color);
-    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
-    background: white;
+    background: var(--text-button-color);
 }
 
 .date-item:hover {
-    border-color: var(--primary-color);
-    transform: translateX(4px);
-    box-shadow: var(--shadow);
+    border-color: var(--button-color);
 }
 
 .date-item .date-label {
@@ -297,7 +284,7 @@ background: gray;
 }
 
 .date-item .date-weekday {
-    color: var(--text-secondary);
+    color: var(--gray);
     font-size: 0.9rem;
 }
 
@@ -306,7 +293,7 @@ background: gray;
     height: 40px;
     margin: 0 auto 20px;
     border: 4px solid var(--border-color);
-    border-top-color: var(--primary-color);
+    border-top-color: var(--button-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -325,7 +312,7 @@ background: gray;
 
 .time-slot {
     padding-bottom: 6px;
-        border-bottom: 2px solid #1a4580;
+    border-bottom: 2px solid var(--text-color);
     display: grid;
     grid-template-columns: 1fr 130px;
 }
@@ -336,7 +323,7 @@ background: gray;
 }
 
 .time-slot.unavailable {
-    color: #969696;
+    color: var(--gray);
 }
 
 .time-slot.loading {
@@ -353,11 +340,10 @@ background: gray;
 .time-label {
     font-weight: 600;
     font-size: 20px;
-    font-family: monospace;
+    font-family: "Google Sans Code";
 }
 
 .status-badge {
-    border-radius: 12px;
     font-size: 0.85rem;
     display: flex;
     text-align: center;
@@ -367,31 +353,34 @@ background: gray;
 }
 
 .status-badge.available {
-    color: #1a4580;
+    color: var(--text-color);
 }
 
 .status-badge.unavailable {
-    background: #ffd8d8;
-    color: #ff0000;
+    background: var(--bg-color);
+    color: var(--red);
 }
 
 .status-badge.loading {
-    background: #c5c5c5;
-    color: #000000;
+    background: var(--gray);
+    color: var(--text-color);
     animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.5;
     }
 }
 
 .courts-info {
-    color: var(--text-secondary);
+    color: var(--gray);
     font-size: 0.9rem;
 }
 
@@ -405,13 +394,12 @@ background: gray;
 
 .court-tag {
     padding: 4px 10px;
-    background: #00a58a;
-    color: white;
-    border-radius: 3px;
+    background: var(--green);
+    color: var(--text-button-color);
     font-size: 1rem;
     font-weight: bold;
     width: 2.9em;
-    font-family: monospace;
+    font-family: "Google Sans Code";
     text-align: center;
 }
 
@@ -421,10 +409,8 @@ background: gray;
     left: 50%;
     transform: translateX(-50%);
     padding: 16px 24px;
-    background: var(--text-primary);
-    color: white;
-    border-radius: 8px;
-    box-shadow: var(--shadow-hover);
+    background: var(--text-color);
+    color: var(--text-button-color);
     opacity: 0;
     transition: opacity 0.3s;
     z-index: 1000;
@@ -436,27 +422,27 @@ background: gray;
 }
 
 .toast.success {
-    background: var(--primary-color);
+    background: var(--green);
 }
 
 .toast.error {
-    background: var(--danger-color);
+    background: var(--red);
 }
 
 .empty-state {
     text-align: center;
     padding: 40px 20px;
-    color: var(--text-secondary);
+    color: var(--gray);
 }
 
 .empty-state h3 {
     margin-bottom: 10px;
-    color: var(--text-primary);
+    color: var(--text-color);
 }
 
 @media (max-width: 640px) {
     .container {
-        padding: 2px;
+        padding: 0;
     }
 
     .card {

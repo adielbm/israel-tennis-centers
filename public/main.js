@@ -173,7 +173,6 @@ async function showCourts(date) {
   navigateToScreen('courts-screen');
   
   document.getElementById('selected-date-title').textContent = formatDateDisplay(date);
-  document.getElementById('loading-message').style.display = 'block';
   document.getElementById('courts-list').innerHTML = '';
   
   try {
@@ -184,7 +183,6 @@ async function showCourts(date) {
     const slots = generateTimeSlotsForDate(date, availableTimeSlots);
     
     if (slots.length === 0) {
-      document.getElementById('loading-message').style.display = 'none';
       document.getElementById('courts-list').innerHTML = `
         <div class="empty-state">
           <h3>אין מגרשים זמינים</h3>
@@ -204,7 +202,6 @@ async function showCourts(date) {
       
       if (isComplete) {
         console.log('Search completed. Results:', results);
-        document.getElementById('loading-message').style.display = 'none';
         
         const availableCount = Array.from(results.values()).filter(r => r.status === 'available').length;
         if (availableCount > 0) {
@@ -221,7 +218,6 @@ async function showCourts(date) {
     await apiService.searchMultipleSlots(credentials.tennisCenter, date, slots, onPartialResult);
   } catch (error) {
     console.error('Error fetching courts:', error);
-    document.getElementById('loading-message').style.display = 'none';
     showToast('שגיאה בטעינת המגרשים', 'error');
   }
 }
