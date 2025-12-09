@@ -4,7 +4,7 @@
   "description": "Web application for checking Israel Tennis Centers court availability",
   "type": "module",
   "scripts": {
-    "dev": "cd public && python3 -m http.server 8000",
+    "dev": "cd public && python3 -m http.server 9000",
     "worker:dev": "cd api && npm run dev",
     "worker:deploy": "cd api && npm run deploy"
   },

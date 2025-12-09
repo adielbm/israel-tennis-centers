@@ -1,10 +1,11 @@
-import { AuthService, APIService } from './api.js';
+import { AuthService, APIService, WeatherService } from './api.js';
 import { getToday, getNextDays, formatDateDisplay, generateTimeSlotsForDate, formatDate, getWeekday } from './utils.js';
 import { TENNIS_CENTERS } from './constants.js';
 
 // Initialize services
 const authService = new AuthService();
 const apiService = new APIService(authService);
+const weatherService = new WeatherService();
 
 // State
 let currentScreen = 'login';
@@ -176,6 +177,12 @@ async function showCourts(date) {
   document.getElementById('courts-list').innerHTML = '';
   
   try {
+    // Get tennis center coordinates
+    const tennisCenter = TENNIS_CENTERS.find(c => c.id === credentials.tennisCenter);
+    const weatherData = tennisCenter 
+      ? await weatherService.getHourlyWeather(tennisCenter.lat, tennisCenter.lng, date)
+      : [];
+    
     // Fetch available time slots from API
     const availableTimeSlots = await apiService.fetchTimeSlots(credentials.tennisCenter, date);
     
@@ -205,7 +212,7 @@ async function showCourts(date) {
       }
 
       // Render results as they arrive
-      renderCourtsResults(slots, results, date);
+      renderCourtsResults(slots, results, date, weatherData);
       
       if (isComplete) {
         console.log('Search completed. Results:', results);
@@ -236,7 +243,7 @@ async function showCourts(date) {
 /**
  * Render courts results (supports partial/streaming updates)
  */
-function renderCourtsResults(slots, results, date) {
+function renderCourtsResults(slots, results, date, weatherData = []) {
   const courtsList = document.getElementById('courts-list');
   courtsList.innerHTML = '';
   
@@ -246,6 +253,10 @@ function renderCourtsResults(slots, results, date) {
     const key = `${formattedDate}_${slot.time}`;
     const result = results.get(key);
     
+    // Extract hour from time slot (e.g., "09:00" -> 9)
+    const hour = parseInt(slot.time.split(':')[0]);
+    const weather = weatherData.find(w => w.hour === hour);
+    
     // If no result yet, show loading state
     if (!result) {
       const timeSlot = document.createElement('div');
@@ -253,6 +264,10 @@ function renderCourtsResults(slots, results, date) {
       timeSlot.innerHTML = `
         <div class="time-slot-header">
           <div class="time-label">${slot.time}</div>
+          ${weather ? `<div class="weather-info">
+            <span class="temp">${Math.round(weather.temperature)}°C</span>
+            ${weather.precipitation > 0 ? `<span class="precip">💧 ${weather.precipitation}mm</span>` : ''}
+          </div>` : ''}
         </div>
         <div class="status-badge loading">בודק</div>
       `;
@@ -276,6 +291,10 @@ function renderCourtsResults(slots, results, date) {
     timeSlot.innerHTML = `
       <div class="time-slot-header">
         <div class="time-label">${slot.time}</div>
+        ${weather ? `<div class="weather-info">
+          <span class="temp">${Math.round(weather.temperature)}°C</span>
+          ${weather.precipitation > 0 ? `<span class="precip">💧 ${weather.precipitation}mm</span>` : ''}
+        </div>` : ''}
       </div>
       <div class="status-badge ${isAvailable ? 'available' : 'unavailable'}">${courtsInfo}</div>
       ${courtTags ? `<div class="court-tags">${courtTags}</div>` : ''}

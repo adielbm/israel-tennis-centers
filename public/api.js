@@ -4,6 +4,59 @@ import { formatDate } from './utils.js';
 const WORKER_URL = 'https://tennis.adielbm.workers.dev';
 
 /**
+ * Weather service using Open-Meteo API
+ */
+class WeatherService {
+  /**
+   * Fetch hourly weather data for a location
+   * @param {number} lat - Latitude
+   * @param {number} lng - Longitude
+   * @param {Date} date - Date to fetch weather for
+   * @returns {Promise<Object>} Weather data with hourly temperature and precipitation
+   */
+  async getHourlyWeather(lat, lng, date) {
+    try {
+      const dateStr = date.toISOString().split('T')[0];
+      const nextDay = new Date(date);
+      nextDay.setDate(date.getDate() + 1);
+      const endDateStr = nextDay.toISOString().split('T')[0];
+      
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,precipitation&timezone=auto&start_date=${dateStr}&end_date=${endDateStr}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch weather data');
+      }
+      
+      const data = await response.json();
+      
+      // Parse hourly data
+      const hourlyData = [];
+      if (data.hourly && data.hourly.time) {
+        for (let i = 0; i < data.hourly.time.length; i++) {
+          const time = data.hourly.time[i];
+          const timeObj = new Date(time);
+          
+          // Only include hours for the requested date
+          if (timeObj.toDateString() === date.toDateString()) {
+            hourlyData.push({
+              hour: timeObj.getHours(),
+              temperature: data.hourly.temperature_2m[i],
+              precipitation: data.hourly.precipitation[i]
+            });
+          }
+        }
+      }
+      
+      return hourlyData;
+    } catch (error) {
+      console.error('Error fetching weather:', error);
+      return [];
+    }
+  }
+}
+
+/**
  * Authentication service
  */
 class AuthService {
@@ -378,4 +431,4 @@ class APIService {
   }
 }
 
-export { AuthService, APIService, WORKER_URL };
+export { AuthService, APIService, WeatherService, WORKER_URL };
