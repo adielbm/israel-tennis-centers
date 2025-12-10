@@ -21,7 +21,7 @@ class WeatherService {
       nextDay.setDate(date.getDate() + 1);
       const endDateStr = nextDay.toISOString().split('T')[0];
       
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&timezone=auto&start_date=${dateStr}&end_date=${endDateStr}`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m&timezone=auto&start_date=${dateStr}&end_date=${endDateStr}`;
       
       const response = await fetch(url);
       if (!response.ok) {
@@ -43,6 +43,7 @@ class WeatherService {
               hour: timeObj.getHours(),
               temperature: data.hourly.temperature_2m[i],
               precipitationProbability: data.hourly.precipitation_probability[i],
+              precipitation: data.hourly.precipitation[i],
               windSpeed: data.hourly.wind_speed_10m[i]
             });
           }

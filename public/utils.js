@@ -78,21 +78,21 @@ export function getNextDays(startDate, days) {
  * Format date for display with day name
  */
 export function formatDateDisplay(date) {
-  const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-  const dayName = days[date.getDay()];
+  const dayName = getWeekday(date);
   const dateStr = formatDate(date);
+  const dateStrAndName = `${dayName}, ${dateStr}`;
 
   // if today or tomorrow, add prefix
   if (date.toDateString() === getToday().toDateString()) {
-    return `היום - ${dateStr}`;
+    return `היום,  ${dateStrAndName}`;
   }
   const tomorrow = new Date(getToday());
   tomorrow.setDate(tomorrow.getDate() + 1);
   if (date.toDateString() === tomorrow.toDateString()) {
-    return `מחר - ${dateStr}`;
+    return `מחר, ${dateStrAndName}`;
   }
 
-  return `${dayName}, ${dateStr}`;
+  return dateStrAndName;
 }
 
 /**

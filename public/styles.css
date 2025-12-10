@@ -8,7 +8,7 @@
         --text-color: #0021d7;
         --button-color: #006fc4;
         --text-button-color: #ffffff;
-        --border-color: #535353;
+        --border-color: #85ba9c;
         --green: #a1ffc9;
         --red: #e74c3c;
         --gray: #c1c1c1;
@@ -21,7 +21,7 @@
         --text-color: #00ffd9;
         --button-color: #0089d3;
         --text-button-color: #151515;
-        --border-color: #b1b1b1;
+        --border-color: #1a2c29;
         --green: #003d35;
         --red: #ff7668;
         --gray: #656565;
@@ -73,13 +73,10 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 30px;
-    padding: 20px 0;
 }
 
 header h2 {
     font-size: 1rem;
-    margin-bottom: 5px;
 }
 
 .screen {
@@ -92,18 +89,10 @@ header h2 {
 
 .card {
     background: var(--text-button-color);
-    border: 2px solid var(--border-color);
     padding: 30px;
 }
 
-@media (max-width: 400px) {
-    .card {
-        border: none;
-    }
-}
-
 .card h2 {
-    margin-bottom: 20px;
     font-size: 1.5rem;
 }
 
@@ -190,9 +179,10 @@ header h2 {
 .header-with-logout,
 .header-with-back {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     margin-bottom: 20px;
+    gap: 2em;
     flex-wrap: wrap;
 }
 
@@ -469,21 +459,17 @@ background: var(--green);
     }
 }
 
-
-#selected-date-title {
-    flex-basis: 100%;
-    text-align: center;
-}
-
-
 #reservation-link {
     cursor: pointer;
     margin: 1em auto;
     font-size: 1em;
-    display: block;
+    display: flex;
     text-align: center;
     background: var(--bg-color);
     color: var(--text-color);
     text-decoration: none;
     padding: 1em;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
 }

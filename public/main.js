@@ -261,11 +261,11 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
           <div class="time-label">${slot.time}</div>
           ${weather ? `<div class="weather-info">
             <span class="temp">${Math.round(weather.temperature)}°C</span>
-            ${weather.precipitationProbability > 0 ? `<span class="precip"><span class="material-symbols-outlined">rainy</span> ${weather.precipitationProbability}%</span>` : ''}
-            ${weather.windSpeed >= 20 ? `<span class="wind"><span class="material-symbols-outlined">air</span><span style="direction: ltr;">${Math.round(weather.windSpeed)}  km/h</span></span>` : ''}
+            ${weather.precipitationProbability > 0 ? `<span class="precip"><span class="material-symbols-outlined">rainy</span> ${weather.precipitationProbability}%${weather.precipitation > 0 ? ` (${weather.precipitation.toFixed(1)}mm)` : ''}</span>` : ''}
+            ${weather.windSpeed >= 20 ? `<span class="wind"><span class="material-symbols-outlined">air</span><span style="direction: ltr;">${Math.round(weather.windSpeed)} km/h</span></span>` : ''}
           </div>` : ''}
         </div>
-        <div class="status-badge loading">בודק</div>
+        <div class="status-badge loading"></div>
       `;
       courtsList.appendChild(timeSlot);
       return;
@@ -289,7 +289,7 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
         <div class="time-label">${slot.time}</div>
         ${weather ? `<div class="weather-info">
           <span class="temp">${Math.round(weather.temperature)}°C</span>
-          ${weather.precipitationProbability > 0 ? `<span class="precip"><span class="material-symbols-outlined">rainy</span> ${weather.precipitationProbability}%</span>` : ''}
+          ${weather.precipitationProbability > 0 ? `<span class="precip"><span class="material-symbols-outlined">rainy</span> ${weather.precipitationProbability}%${weather.precipitation > 0 ? ` (${weather.precipitation.toFixed(1)}mm)` : ''}</span>` : ''}
           ${weather.windSpeed >= 20 ? `<span class="wind"><span class="material-symbols-outlined">air</span> ${Math.round(weather.windSpeed)} km/h</span>` : ''}
         </div>` : ''}
       </div>
