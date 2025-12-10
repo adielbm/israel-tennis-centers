@@ -6,7 +6,7 @@
     :root {
         --bg-color: #cfe5d9;
         --text-color: #0021d7;
-        --button-color: #006fc4;
+        --text-color: #006fc4;
         --text-button-color: #ffffff;
         --border-color: #85ba9c;
         --green: #a1ffc9;
@@ -19,7 +19,7 @@
     :root {
         --bg-color: rgb(0 0 0);
         --text-color: #00ffd9;
-        --button-color: #0089d3;
+        --text-color: #0089d3;
         --text-button-color: #151515;
         --border-color: #1a2c29;
         --green: #003d35;
@@ -93,7 +93,7 @@ header h2 {
 }
 
 .card h2 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 .form-group {
@@ -120,7 +120,7 @@ header h2 {
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--button-color);
+    border-color: var(--text-color);
 }
 
 .btn {
@@ -139,7 +139,7 @@ header h2 {
 }
 
 .btn-primary {
-    background: var(--button-color);
+    background: var(--text-color);
     color: var(--text-button-color);
     width: 100%;
 }
@@ -151,7 +151,7 @@ header h2 {
 
 
 .btn-small {
-    padding: 8px 16px;
+    padding: 5px;
     font-size: 0.9rem;
 }
 
@@ -182,7 +182,7 @@ header h2 {
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 20px;
-    gap: 2em;
+    gap:1em;
     flex-wrap: wrap;
 }
 
@@ -240,8 +240,8 @@ header h2 {
 }
 
 .date-cell.selected {
-    background: var(--button-color);
-    border-color: var(--button-color);
+    background: var(--text-color);
+    border-color: var(--text-color);
 }
 
 .date-cell.disabled {
@@ -265,7 +265,7 @@ header h2 {
 }
 
 .date-item:hover {
-    border-color: var(--button-color);
+    border-color: var(--text-color);
 }
 
 .date-item .date-label {
@@ -333,10 +333,10 @@ header h2 {
 }
 
 .weather-info {
-    display: flex;
-    gap: 20px;
+display: flex;
+    gap: 10px;
     align-items: center;
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     font-family: "Google Sans Code";
     margin-left: auto;
 }
@@ -426,10 +426,6 @@ background: var(--green);
 
 .toast.show {
     opacity: 1;
-}
-
-.toast.success {
-    background: var(--green);
 }
 
 .toast.error {
