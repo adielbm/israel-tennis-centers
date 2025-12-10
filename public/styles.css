@@ -189,7 +189,7 @@ header h2 {
 .date-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
 /* Weekly calendar styles */
@@ -201,7 +201,6 @@ header h2 {
 
 .weekday {
     text-align: center;
-    font-size: 10px;
 }
 
 .date-grid {
@@ -343,10 +342,13 @@ header h2 {
 }
 
 .weather-info .precip,
-.weather-info .wind {
+.weather-info .wind,
+.weather-info .temp
+{
     display: flex;
     align-items: center;
     gap: 4px;
+    direction: ltr;
 }
 
 

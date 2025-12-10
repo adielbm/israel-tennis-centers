@@ -103,6 +103,11 @@ export function getWeekday(date) {
   return days[date.getDay()];
 }
 
+export function getShortWeekday(date) {
+  const days = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
+  return days[date.getDay()];
+}
+
 /**
  * Generate time slots for a specific date starting from current hour if it's today
  * Can accept custom time slots from the API or use default slots

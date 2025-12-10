@@ -1,5 +1,5 @@
 import { AuthService, APIService, WeatherService } from './api.js';
-import { getToday, getNextDays, formatDateDisplay, generateTimeSlotsForDate, formatDate, getWeekday } from './utils.js';
+import { getToday, getNextDays, formatDateDisplay, generateTimeSlotsForDate, formatDate, getShortWeekday } from './utils.js';
 import { TENNIS_CENTERS } from './constants.js';
 
 // Initialize services
@@ -115,7 +115,7 @@ function showDateSelection() {
     d.setDate(startOfWeek.getDate() + i);
     const weekdayCell = document.createElement('div');
     weekdayCell.className = 'weekday';
-    weekdayCell.textContent = getWeekday(d);
+    weekdayCell.textContent = getShortWeekday(d);
     weekdaysRow.appendChild(weekdayCell);
   }
   dateList.appendChild(weekdaysRow);
@@ -173,6 +173,11 @@ async function showCourts(date) {
   selectedDate = date;
   navigateToScreen('courts-screen');
   
+  const loadingMessage = document.getElementById('loading-message');
+  if (loadingMessage) {
+    loadingMessage.style.display = 'block';
+  }
+
   document.getElementById('selected-date-title').textContent = formatDateDisplay(date);
   document.getElementById('courts-list').innerHTML = '';
   
@@ -206,7 +211,6 @@ async function showCourts(date) {
     const onPartialResult = (results, isComplete) => {
 
       // hide loading-message
-      const loadingMessage = document.getElementById('loading-message');
       if (loadingMessage) {
         loadingMessage.style.display = 'none';
       }
