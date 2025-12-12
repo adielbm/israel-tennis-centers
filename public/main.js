@@ -20,7 +20,7 @@ function showToast(message, type = 'info') {
   toast.textContent = message;
   toast.className = `toast ${type}`;
   toast.classList.add('show');
-  
+
   setTimeout(() => {
     toast.classList.remove('show');
   }, 3000);
@@ -42,7 +42,7 @@ function navigateToScreen(screenId) {
  */
 async function handleLogin(e) {
   e.preventDefault();
-  
+
   let email = document.getElementById('email').value;
   let userId = document.getElementById('user-id').value;
   const tennisCenter = document.getElementById('tennis-center-city').value;
@@ -56,19 +56,19 @@ async function handleLogin(e) {
   // trim inputs
   email = email.trim();
   userId = userId.trim();
-  
+
   // Validate tennis center is selected
   if (!tennisCenter) {
     showToast('יש לבחור מרכז טניס', 'error');
     return;
   }
-  
+
   // Store credentials
   credentials = { email, userId, tennisCenter };
   localStorage.setItem('credentials', JSON.stringify(credentials));
-  
+
   showToast('מתחבר...', 'info');
-  
+
   try {
     await authService.login(email, userId);
     showToast('התחברת בהצלחה!', 'success');
@@ -84,13 +84,13 @@ async function handleLogin(e) {
  */
 function showDateSelection() {
   navigateToScreen('date-screen');
-  
+
   // Update user email display
   const userEmailElement = document.getElementById('user-email');
   if (userEmailElement && credentials) {
     userEmailElement.textContent = credentials.email;
   }
-  
+
   const dateList = document.getElementById('date-list');
   dateList.innerHTML = '';
   const today = getToday();
@@ -128,13 +128,13 @@ function showDateSelection() {
     for (let day = 0; day < 7; day++) {
       const currentDate = new Date(startOfWeek);
       currentDate.setDate(startOfWeek.getDate() + week * 7 + day);
-      
+
       const dateCell = document.createElement('button');
       dateCell.className = 'date-cell';
-      
+
       // Check if this date is in our valid range (today or later, and within 14 days)
       const isValid = currentDate >= today && currentDate <= lastDate;
-      
+
       if (!isValid) {
         // Empty cell for dates before today or after 14 days
         dateCell.classList.add('disabled');
@@ -172,7 +172,7 @@ function showDateSelection() {
 async function showCourts(date) {
   selectedDate = date;
   navigateToScreen('courts-screen');
-  
+
   const loadingMessage = document.getElementById('loading-message');
   if (loadingMessage) {
     loadingMessage.style.display = 'block';
@@ -180,33 +180,32 @@ async function showCourts(date) {
 
   document.getElementById('selected-date-title').textContent = formatDateDisplay(date);
   document.getElementById('courts-list').innerHTML = '';
-  
+
   try {
     // Get tennis center coordinates
     const tennisCenter = TENNIS_CENTERS.find(c => c.id === credentials.tennisCenter);
-    const weatherData = tennisCenter 
+    const weatherData = tennisCenter
       ? await weatherService.getHourlyWeather(tennisCenter.lat, tennisCenter.lng, date)
       : [];
-    
+
     // Fetch available time slots from API
     const availableTimeSlots = await apiService.fetchTimeSlots(credentials.tennisCenter, date);
-    
+
     // Generate time slots for display
     const slots = generateTimeSlotsForDate(date, availableTimeSlots);
-    
+
     if (slots.length === 0) {
-      document.getElementById('courts-list').innerHTML = `
-        <div class="empty-state">
-          <h3>אין מגרשים זמינים</h3>
-          <p>יש לנסות תאריך אחר.</p>
-        </div>
-      `;
+      document.getElementById('courts-list').innerHTML = `<div class="empty-state"><h3>אין מגרשים זמינים</h3><p>יש לנסות תאריך אחר.</p></div>`;
+      if (loadingMessage) {
+        loadingMessage.style.display = 'none';
+      }
+
       return;
     }
-    
+
     // Search for court availability for all slots with streaming
     console.log('Searching for courts with:', { tennisCenter: credentials.tennisCenter, date, slotsCount: slots.length });
-    
+
     // Callback for partial results during streaming
     const onPartialResult = (results, isComplete) => {
 
@@ -217,25 +216,25 @@ async function showCourts(date) {
 
       // Render results as they arrive
       renderCourtsResults(slots, results, date, weatherData);
-      
+
       if (isComplete) {
         console.log('Search completed. Results:', results);
-        
+
         const availableCount = Array.from(results.values()).filter(r => r.status === 'available').length;
         if (availableCount === 0) {
-          showToast('לא נמצאו מגרשים פנויים', 'info');
+          document.getElementById('courts-list').innerHTML = `<div class="empty-state"><h3>אין מגרשים זמינים</h3><p>יש לנסות תאריך אחר.</p></div>`;
         }
       }
     };
-    
+
     await apiService.searchMultipleSlots(credentials.tennisCenter, date, slots, onPartialResult);
   } catch (error) {
     console.error('Error fetching courts:', error);
-      const loadingMessage = document.getElementById('loading-message');
-      if (loadingMessage) {
-        loadingMessage.style.display = 'none';
-      }
-    showToast('שגיאה בטעינת המגרשים', 'error');
+    const loadingMessage = document.getElementById('loading-message');
+    if (loadingMessage) {
+      loadingMessage.style.display = 'none';
+    }
+    showToast('אירעה שגיאה', 'error');
   }
 }
 
@@ -245,17 +244,17 @@ async function showCourts(date) {
 function renderCourtsResults(slots, results, date, weatherData = []) {
   const courtsList = document.getElementById('courts-list');
   courtsList.innerHTML = '';
-  
+
   slots.forEach((slot) => {
     // Use formatDate to match the key format used in searchMultipleSlots
     const formattedDate = formatDate(slot.date);
     const key = `${formattedDate}_${slot.time}`;
     const result = results.get(key);
-    
+
     // Extract hour from time slot (e.g., "09:00" -> 9)
     const hour = parseInt(slot.time.split(':')[0]);
     const weather = weatherData.find(w => w.hour === hour);
-    
+
     // If no result yet, show loading state
     if (!result) {
       const timeSlot = document.createElement('div');
@@ -274,20 +273,20 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
       courtsList.appendChild(timeSlot);
       return;
     }
-    
+
     const isAvailable = result.status === 'available';
-    
+
     const timeSlot = document.createElement('div');
     timeSlot.className = `time-slot ${isAvailable ? 'available' : 'unavailable'}`;
-    
-    const courtsInfo = isAvailable 
+
+    const courtsInfo = isAvailable
       ? `${result.courts.length} מגרש${result.courts.length > 1 ? 'ים' : ''}`
       : 'תפוס';
-    
-    const courtTags = isAvailable 
+
+    const courtTags = isAvailable
       ? result.courts.map(num => `<span class="court-tag">${num}</span>`).join('')
       : '';
-    
+
     timeSlot.innerHTML = `
       <div class="time-slot-header">
         <div class="time-label">${slot.time}</div>
@@ -300,7 +299,7 @@ function renderCourtsResults(slots, results, date, weatherData = []) {
       <div class="status-badge ${isAvailable ? 'available' : 'unavailable'}">${courtsInfo}</div>
       ${courtTags ? `<div class="court-tags">${courtTags}</div>` : ''}
     `;
-    
+
     courtsList.appendChild(timeSlot);
   });
 }
@@ -341,13 +340,13 @@ function updateTennisCenterDisplay(tennisCenterId) {
 function parseDateFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const dateParam = urlParams.get('date');
-  
+
   if (!dateParam) {
     return null;
   }
-  
+
   let date;
-  
+
   // Try parsing YYYY-MM-DD format (ISO)
   if (dateParam.match(/^\d{4}-\d{2}-\d{2}$/)) {
     date = new Date(dateParam);
@@ -361,20 +360,20 @@ function parseDateFromURL() {
     console.error('Invalid date format in URL. Use YYYY-MM-DD or DD/MM/YYYY');
     return null;
   }
-  
+
   // Validate date is valid
   if (isNaN(date.getTime())) {
     console.error('Invalid date in URL');
     return null;
   }
-  
+
   // Validate date is in the future (or today)
   const today = getToday();
   if (date < today) {
     console.error('Date in URL is in the past');
     return null;
   }
-  
+
   // Validate date is within 14 days
   const maxDate = new Date(today);
   maxDate.setDate(today.getDate() + 14);
@@ -382,7 +381,7 @@ function parseDateFromURL() {
     console.error('Date in URL is too far in the future (max 14 days)');
     return null;
   }
-  
+
   return date;
 }
 
@@ -393,11 +392,11 @@ function init() {
   // Check if already logged in
   const storedCredentials = localStorage.getItem('credentials');
   const urlDate = parseDateFromURL();
-  
+
   if (storedCredentials && authService.loadFromStorage()) {
     credentials = JSON.parse(storedCredentials);
     updateTennisCenterDisplay(credentials.tennisCenter);
-    
+
     // If date is provided in URL, go directly to courts screen
     if (urlDate) {
       showCourts(urlDate);
@@ -408,14 +407,14 @@ function init() {
     // If date is provided but not logged in, show toast
     showToast('יש להתחבר תחילה', 'error');
   }
-  
+
   // Event listeners
   document.getElementById('login-form').addEventListener('submit', handleLogin);
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
   document.getElementById('back-btn').addEventListener('click', handleBack);
-  
+
   // Tennis center selector change handler
-  document.getElementById('tennis-center-city').addEventListener('change', function(e) {
+  document.getElementById('tennis-center-city').addEventListener('change', function (e) {
     if (e.target.value && credentials) {
       credentials.tennisCenter = e.target.value;
       localStorage.setItem('credentials', JSON.stringify(credentials));
